@@ -302,6 +302,16 @@
     .btn-o { border: 1px solid var(--border); color: var(--text); background: transparent; }
 
     /* ═══════════════════════════════════════════
+       CARD DECK — DESKTOP FULL WIDTH
+    ═══════════════════════════════════════════ */
+    @media (min-width: 769px) {
+      .deck-outer { gap: 28px; }
+      .deck-outer > div { flex: 1; min-width: 0; }
+      .deck-stage { width: 100%; }
+      .story-card { width: 100%; }
+    }
+
+    /* ═══════════════════════════════════════════
        CARD DECK RESPONSIVE
     ═══════════════════════════════════════════ */
     @media (max-width: 768px) {
