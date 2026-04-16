@@ -371,13 +371,15 @@
     /* ═══════════════════════════════════════════
        ABOUT
     ═══════════════════════════════════════════ */
-    #about {
+    #about { display: flex; flex-direction: column; }
+    .about-grid {
       display: grid;
       grid-template-columns: 1fr 1.1fr;
       gap: clamp(3rem,6vw,8rem);
       align-items: center;
     }
-    @media(max-width:768px){ #about { grid-template-columns: 1fr; } }
+    @media(max-width:768px){ .about-grid { grid-template-columns: 1fr; } }
+    #about #my-story { padding: 0; margin-top: 80px; }
 
     .about-img-wrap {
       position: relative; aspect-ratio: 4/5;
@@ -591,6 +593,78 @@
     .s-link:hover { color: var(--text); border-color: var(--p); background: rgba(139,92,246,.1); }
 
     /* ═══════════════════════════════════════════
+       MY STORY CARD DECK
+    ═══════════════════════════════════════════ */
+    #my-story {
+      position: relative; overflow: hidden;
+    }
+    #my-story::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+      background-image: radial-gradient(rgba(139,92,246,.12) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+    }
+    .deck-outer {
+      display: flex; align-items: center; justify-content: center;
+      gap: 44px; margin-top: 64px; position: relative; z-index: 1;
+    }
+    .deck-stage {
+      position: relative;
+      width: 320px; height: 440px;
+      touch-action: none;
+    }
+    .story-card {
+      position: absolute; top: 0; left: 0;
+      width: 320px; height: 440px;
+      border-radius: 24px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 36px 32px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      transform-origin: bottom center;
+      will-change: transform;
+      cursor: grab;
+      user-select: none;
+      box-shadow: 0 24px 64px rgba(0,0,0,.45);
+      transition: border-color .3s;
+    }
+    .story-card:active { cursor: grabbing; }
+    .story-card:first-child { border-color: rgba(139,92,246,.25); }
+    .card-top { display: flex; flex-direction: column; gap: 14px; }
+    .card-num {
+      font-family: var(--mono); font-size: .65rem;
+      color: var(--p); letter-spacing: .22em; text-transform: uppercase;
+    }
+    .card-accent { width: 36px; height: 3px; border-radius: 2px; }
+    .card-title {
+      font-size: 1.55rem; font-weight: 700;
+      letter-spacing: -.03em; line-height: 1.2;
+    }
+    .card-body {
+      font-size: .875rem; color: var(--muted);
+      line-height: 1.8;
+    }
+    .deck-chevron {
+      width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text); font-size: 1.5rem; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: none;
+      transition: background .3s, border-color .3s, transform .3s cubic-bezier(.34,1.56,.64,1);
+    }
+    .deck-chevron:hover { background: var(--p); border-color: var(--p); transform: scale(1.12); }
+    .deck-progress {
+      display: flex; justify-content: center; gap: 8px;
+      margin-top: 28px; position: relative; z-index: 1;
+    }
+    .dp-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--border);
+      transition: background .3s, transform .3s, width .3s;
+    }
+    .dp-dot.active { background: var(--c); transform: scale(1.4); width: 18px; border-radius: 3px; }
+
+    /* ═══════════════════════════════════════════
        DESIGN PROCESS
     ═══════════════════════════════════════════ */
     #process { position: relative; overflow: hidden; }
@@ -795,38 +869,96 @@
      ABOUT
 ═══════════════════════════════════ -->
 <section id="about">
+  <div class="about-grid">
   <div class="about-img-wrap" id="aimg">
     <div class="about-img-inner">
       <img src="profile.jpg" alt="Ronold Anthony" />
     </div>
     <div class="float-badge fb-1">🚀 5+ Years Experience</div>
-    <div class="float-badge fb-2">✦ Open to Projects</div>
+    <div class="float-badge fb-2">✦ Constraints = Clarity</div>
   </div>
 
   <div class="about-body">
     <div class="s-label">About Me</div>
     <h2 class="s-title">
-      <span class="w"><s>I build</s></span>
-      <span class="w"><s>things</s></span><br>
-      <span class="w"><s>people</s></span>
-      <span class="w"><s style="color:var(--c)">feel.</s></span>
+      <span class="w"><s>Turning complexity</s></span><br>
+      <span class="w"><s>into usable,</s></span>
+      <span class="w"><s style="color:var(--c)">meaningful products.</s></span>
     </h2>
 
     <p class="about-text">
-      A <strong>full-stack creative developer</strong> who lives at the intersection of design and technology.
-      I craft immersive digital experiences — from pixel-perfect interfaces to performant, scalable applications.
-    </p>
-    <p class="about-text" style="margin-top:14px;transition-delay:.12s">
-      When I'm not coding I'm studying <strong>motion design</strong>, experimenting with generative art,
-      or obsessing over the perfect micro-interaction.
+      For the past 5+ years, I've been designing products that solve real problems—not just look good. I enjoy working through constraints, simplifying complexity, and crafting experiences that feel intuitive from the first interaction. I'm deeply curious about <strong>interaction design</strong>, <strong>motion</strong>, and the details most people overlook.
     </p>
 
     <div class="stats-grid">
-      <div class="stat"><span class="stat-n" data-count="50">0</span><span class="stat-l">Projects</span></div>
+      <div class="stat"><span class="stat-n" data-count="50">0</span><span class="stat-l">Features</span></div>
       <div class="stat"><span class="stat-n" data-count="5">0</span><span class="stat-l">Years Exp.</span></div>
-      <div class="stat"><span class="stat-n" data-count="30">0</span><span class="stat-l">Clients</span></div>
+      <div class="stat"><span class="stat-n">3+</span><span class="stat-l">Products</span><span style="display:block;font-size:.7rem;color:var(--muted);margin-top:6px">Built from 0 → 1</span></div>
     </div>
   </div>
+  </div><!-- end .about-grid -->
+
+  <div id="my-story">
+    <div class="s-label" style="position:relative;z-index:1">My Story</div>
+    <div class="deck-outer">
+      <button class="deck-chevron" id="deck-prev">&#8249;</button>
+      <div>
+        <div class="deck-stage" id="deck-stage">
+          <div class="story-card">
+            <div class="card-top">
+              <div class="card-num">Chapter 01</div>
+              <div class="card-accent" style="background:linear-gradient(90deg,#8b5cf6,#00ffd1)"></div>
+              <h3 class="card-title">Where It<br>All Started</h3>
+            </div>
+            <p class="card-body">Your story content goes here. Tell the reader something personal about how you got into design — a moment, a memory, a spark.</p>
+          </div>
+          <div class="story-card">
+            <div class="card-top">
+              <div class="card-num">Chapter 02</div>
+              <div class="card-accent" style="background:linear-gradient(90deg,#00ffd1,#ff3370)"></div>
+              <h3 class="card-title">Finding My<br>Direction</h3>
+            </div>
+            <p class="card-body">Your story content goes here. Describe the moment you discovered product design and what drew you to solving real problems over just making things look nice.</p>
+          </div>
+          <div class="story-card">
+            <div class="card-top">
+              <div class="card-num">Chapter 03</div>
+              <div class="card-accent" style="background:linear-gradient(90deg,#ff3370,#ffd700)"></div>
+              <h3 class="card-title">First Real<br>Challenge</h3>
+            </div>
+            <p class="card-body">Your story content goes here. Share a defining project or challenge early in your career that shaped how you think about design under constraints.</p>
+          </div>
+          <div class="story-card">
+            <div class="card-top">
+              <div class="card-num">Chapter 04</div>
+              <div class="card-accent" style="background:linear-gradient(90deg,#ffd700,#8b5cf6)"></div>
+              <h3 class="card-title">Learning to<br>Say Less</h3>
+            </div>
+            <p class="card-body">Your story content goes here. Talk about the shift from adding things to removing them — how you learned that clarity is the hardest thing to achieve.</p>
+          </div>
+          <div class="story-card">
+            <div class="card-top">
+              <div class="card-num">Chapter 05</div>
+              <div class="card-accent" style="background:linear-gradient(90deg,#8b5cf6,#ff3370)"></div>
+              <h3 class="card-title">Building From<br>Zero</h3>
+            </div>
+            <p class="card-body">Your story content goes here. Describe what it felt like to own a product end-to-end for the first time — the weight of that responsibility and what you learned.</p>
+          </div>
+          <div class="story-card">
+            <div class="card-top">
+              <div class="card-num">Chapter 06</div>
+              <div class="card-accent" style="background:linear-gradient(90deg,#00ffd1,#8b5cf6)"></div>
+              <h3 class="card-title">Where I Am<br>Today</h3>
+            </div>
+            <p class="card-body">Your story content goes here. Close with where you are now — what drives you, what kind of work excites you, and where you want to go next.</p>
+          </div>
+        </div>
+        <div class="deck-progress" id="deck-progress"></div>
+      </div>
+      <button class="deck-chevron" id="deck-next">&#8250;</button>
+    </div>
+  </div>
+
 </section>
 
 <!-- ══════════════════════════════════
@@ -1274,7 +1406,7 @@ function startAnimations () {
         const target = +el.dataset.count;
         gsap.to({ v: 0 }, {
           v: target, duration: 2.2, ease: 'power2.out', delay: .9,
-          onUpdate () { el.textContent = Math.round(this.targets()[0].v) + (target > 5 ? '+' : ''); }
+          onUpdate () { el.textContent = Math.round(this.targets()[0].v) + (target >= 5 ? '+' : ''); }
         });
       });
     }
@@ -1383,6 +1515,132 @@ document.querySelectorAll('nav a').forEach(a => {
   const orig = a.textContent;
   a.addEventListener('mouseenter', () => scramble(a, orig));
 });
+
+// ─── CARD DECK ───────────────────────────────────────────────
+(function () {
+  const stage = document.getElementById('deck-stage');
+  const progressEl = document.getElementById('deck-progress');
+  if (!stage) return;
+
+  const cards = [...stage.querySelectorAll('.story-card')];
+  const N = cards.length;
+  let isAnimating = false;
+  let activeIndex = 0;
+
+  // Build progress dots
+  cards.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dp-dot' + (i === 0 ? ' active' : '');
+    progressEl.appendChild(d);
+  });
+  const dots = [...progressEl.querySelectorAll('.dp-dot')];
+
+  function getPos(i) {
+    const cfg = [
+      { rotation: 0,   y: 0,  scale: 1,    zIndex: N },
+      { rotation: -7,  y: 12, scale: 0.96, zIndex: N - 1 },
+      { rotation: 7,   y: 20, scale: 0.92, zIndex: N - 2 },
+      { rotation: -4,  y: 26, scale: 0.89, zIndex: N - 3 },
+      { rotation: 4,   y: 30, scale: 0.86, zIndex: N - 4 },
+      { rotation: -2,  y: 33, scale: 0.83, zIndex: N - 5 },
+    ];
+    return cfg[Math.min(i, cfg.length - 1)];
+  }
+
+  function arrange(animate) {
+    cards.forEach((card, i) => {
+      const p = getPos(i);
+      if (animate && i > 0) {
+        gsap.to(card, { rotation: p.rotation, y: p.y, scale: p.scale, zIndex: p.zIndex, duration: 0.45, ease: 'power2.out' });
+      } else {
+        gsap.set(card, { rotation: p.rotation, y: p.y, scale: p.scale, zIndex: p.zIndex, x: 0, opacity: 1 });
+      }
+    });
+  }
+
+  function updateDots() {
+    dots.forEach((d, i) => d.classList.toggle('active', i === activeIndex));
+  }
+
+  function goNext() {
+    if (isAnimating) return;
+    isAnimating = true;
+    const front = cards[0];
+    gsap.to(front, {
+      x: 560, rotation: 28, opacity: 0, duration: 0.42, ease: 'power2.in',
+      onComplete: () => {
+        cards.push(cards.shift());
+        gsap.set(front, { x: 0, opacity: 1, ...getPos(N - 1) });
+        arrange(true);
+        activeIndex = (activeIndex + 1) % N;
+        updateDots();
+        isAnimating = false;
+      }
+    });
+  }
+
+  function goPrev() {
+    if (isAnimating) return;
+    isAnimating = true;
+    const last = cards[cards.length - 1];
+    cards.unshift(cards.pop());
+    gsap.set(last, { x: -560, rotation: -28, opacity: 0, zIndex: N + 1 });
+    arrange(true);
+    gsap.to(last, { x: 0, rotation: 0, opacity: 1, scale: 1, duration: 0.42, ease: 'power2.out' });
+    activeIndex = (activeIndex - 1 + N) % N;
+    updateDots();
+    setTimeout(() => { isAnimating = false; }, 450);
+  }
+
+  arrange(false);
+
+  document.getElementById('deck-next').addEventListener('click', goNext);
+  document.getElementById('deck-prev').addEventListener('click', goPrev);
+
+  // Add chevrons to cursor hover list
+  document.querySelectorAll('.deck-chevron').forEach(el => {
+    el.addEventListener('mouseenter', () => { dot.classList.add('hov'); ring.classList.add('hov'); });
+    el.addEventListener('mouseleave', () => { dot.classList.remove('hov'); ring.classList.remove('hov'); });
+  });
+
+  // Drag interaction
+  let startX = 0, dragX = 0, dragging = false;
+
+  stage.addEventListener('pointerdown', e => {
+    if (isAnimating) return;
+    dragging = true; startX = e.clientX; dragX = 0;
+    stage.setPointerCapture(e.pointerId);
+  });
+
+  stage.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    dragX = e.clientX - startX;
+    gsap.set(cards[0], { x: dragX, rotation: dragX * 0.07 });
+  });
+
+  stage.addEventListener('pointerup', () => {
+    if (!dragging) return;
+    dragging = false;
+    if (Math.abs(dragX) > 90) {
+      const front = cards[0];
+      const dir = dragX > 0 ? 1 : -1;
+      gsap.to(front, {
+        x: dir * 600, rotation: dir * 25, opacity: 0, duration: 0.35, ease: 'power2.in',
+        onComplete: () => {
+          cards.push(cards.shift());
+          gsap.set(front, { x: 0, opacity: 1, ...getPos(N - 1) });
+          arrange(true);
+          activeIndex = (activeIndex + 1) % N;
+          updateDots();
+          isAnimating = false;
+        }
+      });
+    } else {
+      gsap.to(cards[0], { x: 0, rotation: getPos(0).rotation, duration: 0.5, ease: 'elastic.out(1, 0.6)' });
+    }
+    dragX = 0;
+  });
+})();
 
 // ─── SKILL TAG RANDOM COLOR ON HOVER ────────────────────────
 const skillClrs = ['var(--p)','var(--c)','var(--pk)','var(--y)'];
