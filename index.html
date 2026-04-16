@@ -311,15 +311,19 @@
       .deck-outer {
         flex-direction: column;
         align-items: center;
-        gap: 24px;
+        gap: 20px;
       }
 
-      /* Middle div (stage + progress dots) comes first */
-      .deck-outer > div    { order: 1; width: 100%; }
+      .deck-outer > div { order: 1; width: 100%; }
 
-      /* Both chevrons sit in a row below — use order + flex trick */
-      .deck-outer > button { order: 2; }
-      #deck-prev           { margin-right: 8px; }
+      #deck-prev, #deck-next { display: none; }
+
+      .chevron-row {
+        display: flex;
+        flex-direction: row;
+        gap: 16px;
+        order: 2;
+      }
 
       /* Card: portrait, fits within viewport */
       .deck-stage {
@@ -350,16 +354,22 @@
 
     @media (max-width: 768px) {
       nav {
-        padding: 6px 8px;
+        left: 0; right: 0;
+        transform: none;
+        top: 0;
+        border-radius: 0;
+        border-left: none; border-right: none; border-top: none;
+        padding: 10px 16px;
         gap: 2px;
+        justify-content: space-between;
       }
       nav .n-logo {
-        padding: 4px 8px 4px 4px;
+        padding: 4px 10px 4px 4px;
         font-size: .65rem;
       }
       nav a {
         font-size: .7rem;
-        padding: 5px 8px;
+        padding: 5px 7px;
       }
     }
 
@@ -705,6 +715,8 @@
       font-size: .875rem; color: var(--muted);
       line-height: 1.8;
     }
+    .chevron-row { display: none; }
+
     .deck-chevron {
       width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
       border: 1px solid var(--border); background: var(--surface);
@@ -965,6 +977,7 @@
       <button class="deck-chevron" id="deck-prev">&#8249;</button>
       <div>
         <div class="deck-stage" id="deck-stage">
+
           <div class="story-card">
             <div class="card-top">
               <div class="card-num">Chapter 01</div>
@@ -1015,6 +1028,10 @@
           </div>
         </div>
         <div class="deck-progress" id="deck-progress"></div>
+        <div class="chevron-row">
+          <button class="deck-chevron" id="deck-prev-mob">&#8249;</button>
+          <button class="deck-chevron" id="deck-next-mob">&#8250;</button>
+        </div>
       </div>
       <button class="deck-chevron" id="deck-next">&#8250;</button>
     </div>
@@ -1658,6 +1675,8 @@ document.querySelectorAll('nav a').forEach(a => {
 
   document.getElementById('deck-next').addEventListener('click', goNext);
   document.getElementById('deck-prev').addEventListener('click', goPrev);
+  document.getElementById('deck-next-mob').addEventListener('click', goNext);
+  document.getElementById('deck-prev-mob').addEventListener('click', goPrev);
 
   // Add chevrons to cursor hover list
   document.querySelectorAll('.deck-chevron').forEach(el => {
