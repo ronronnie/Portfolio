@@ -306,28 +306,37 @@
     ═══════════════════════════════════════════ */
     @media (max-width: 768px) {
       #my-story { overflow: visible; }
+
+      /* Stack: card on top, chevrons in a row below */
       .deck-outer {
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
-        justify-content: center;
-        gap: 10px;
+        gap: 24px;
       }
-      .deck-outer > div {
-        flex: 1;
-        min-width: 0;
-      }
+
+      /* Middle div (stage + progress dots) comes first */
+      .deck-outer > div    { order: 1; width: 100%; }
+
+      /* Both chevrons sit in a row below — use order + flex trick */
+      .deck-outer > button { order: 2; }
+      #deck-prev           { margin-right: 8px; }
+
+      /* Card: portrait, fits within viewport */
       .deck-stage {
-        width: 100%;
+        width: min(72vw, 300px);
         height: 420px;
+        margin: 0 auto;
       }
       .story-card {
-        width: 100%;
+        width: min(72vw, 300px);
         height: 420px;
+        padding: 28px 24px;
+        overflow: hidden;
       }
+
       .deck-chevron {
-        width: 36px; height: 36px;
-        font-size: 1rem;
-        flex-shrink: 0;
+        width: 44px; height: 44px;
+        font-size: 1.2rem;
       }
     }
 
