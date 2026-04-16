@@ -305,30 +305,30 @@
        CARD DECK RESPONSIVE
     ═══════════════════════════════════════════ */
     @media (max-width: 768px) {
+      #my-story { overflow: visible; }
       .deck-outer {
-        gap: 0;
-        position: relative;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+      .deck-outer > div {
+        flex: 1;
+        min-width: 0;
       }
       .deck-stage {
-        width: calc(100vw - clamp(2rem,5vw,5rem) * 2);
-        height: 460px;
+        width: 100%;
+        height: 420px;
       }
       .story-card {
-        width: calc(100vw - clamp(2rem,5vw,5rem) * 2);
-        height: 460px;
+        width: 100%;
+        height: 420px;
       }
       .deck-chevron {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
         width: 36px; height: 36px;
         font-size: 1rem;
-        z-index: 10;
+        flex-shrink: 0;
       }
-      #deck-prev { left: 0; }
-      #deck-next { right: 0; }
     }
 
     /* ═══════════════════════════════════════════
