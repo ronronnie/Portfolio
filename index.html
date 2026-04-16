@@ -302,6 +302,36 @@
     .btn-o { border: 1px solid var(--border); color: var(--text); background: transparent; }
 
     /* ═══════════════════════════════════════════
+       CARD DECK RESPONSIVE
+    ═══════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .deck-outer {
+        gap: 0;
+        position: relative;
+        flex-direction: column;
+        align-items: center;
+      }
+      .deck-stage {
+        width: calc(100vw - clamp(2rem,5vw,5rem) * 2);
+        height: 460px;
+      }
+      .story-card {
+        width: calc(100vw - clamp(2rem,5vw,5rem) * 2);
+        height: 460px;
+      }
+      .deck-chevron {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 36px; height: 36px;
+        font-size: 1rem;
+        z-index: 10;
+      }
+      #deck-prev { left: 0; }
+      #deck-next { right: 0; }
+    }
+
+    /* ═══════════════════════════════════════════
        MOBILE RESPONSIVE
     ═══════════════════════════════════════════ */
     @media (max-width: 900px) {
@@ -611,12 +641,12 @@
     }
     .deck-stage {
       position: relative;
-      width: 420px; height: 540px;
+      width: 660px; height: 420px;
       touch-action: none;
     }
     .story-card {
       position: absolute; top: 0; left: 0;
-      width: 420px; height: 540px;
+      width: 660px; height: 420px;
       border-radius: 24px;
       background: var(--surface2);
       border: 1px solid var(--border);
