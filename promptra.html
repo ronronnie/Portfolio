@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Promptra — Case Study · Ronold Anthony</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:       #07070f;
+      --surface:  #0e0e1c;
+      --surface2: #141428;
+      --p:        #8b5cf6;
+      --c:        #00ffd1;
+      --pk:       #ff3370;
+      --y:        #ffd700;
+      --text:     #f0eef8;
+      --muted:    #6e6d8a;
+      --border:   rgba(255,255,255,0.065);
+      --sans:     'Space Grotesk', sans-serif;
+      --mono:     'Space Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); overflow-x: hidden; cursor: none; }
+
+    /* grain */
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.035; pointer-events: none; z-index: 9999;
+    }
+
+    /* cursor */
+    #cur-dot  { width:8px; height:8px; background:var(--c); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:10001; transform:translate(-50%,-50%); mix-blend-mode:exclusion; }
+    #cur-ring { width:42px; height:42px; border:1.5px solid rgba(0,255,209,.35); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:10000; transform:translate(-50%,-50%); transition:width .35s cubic-bezier(.165,.84,.44,1), height .35s cubic-bezier(.165,.84,.44,1), border-color .3s; }
+    #cur-dot.hov  { width:14px; height:14px; background:var(--pk); }
+    #cur-ring.hov { width:64px; height:64px; border-color:rgba(255,51,112,.5); }
+    @media (max-width:768px) { body { cursor:auto; } #cur-dot,#cur-ring { display:none; } }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 32px; z-index: 1000;
+      background: rgba(14,14,28,.72); backdrop-filter: blur(18px);
+      border: 1px solid var(--border); border-radius: 100px;
+      padding: 10px 20px 10px 16px;
+      width: min(92vw, 720px);
+    }
+    .nav-back {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--mono); font-size: .72rem; color: var(--muted);
+      text-decoration: none; letter-spacing: .06em;
+      transition: color .3s;
+    }
+    .nav-back:hover { color: var(--c); }
+    .nav-back .arrow { font-size: 1rem; transition: transform .3s; }
+    .nav-back:hover .arrow { transform: translateX(-4px); }
+    .nav-logo { font-family: var(--mono); font-size: .8rem; color: var(--text); font-weight: 700; letter-spacing: .08em; }
+    .nav-cta {
+      font-family: var(--mono); font-size: .7rem; letter-spacing: .08em;
+      padding: 8px 18px; border-radius: 100px;
+      background: linear-gradient(135deg, var(--p), var(--c));
+      color: var(--bg); font-weight: 700; text-decoration: none;
+      transition: opacity .3s, transform .3s;
+      white-space: nowrap;
+    }
+    .nav-cta:hover { opacity: .85; transform: scale(1.04); }
+
+    /* ── HERO ── */
+    .cs-hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: flex-end; padding: clamp(6rem,10vw,10rem) clamp(2rem,7vw,8rem) clamp(3rem,6vw,6rem);
+      position: relative; overflow: hidden;
+    }
+    .hero-gradient {
+      position: absolute; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse 80% 70% at 60% 30%, rgba(139,92,246,.22) 0%, transparent 60%),
+                  radial-gradient(ellipse 50% 50% at 20% 80%, rgba(255,215,0,.1) 0%, transparent 55%);
+    }
+    .hero-grid-lines {
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 30%, transparent 100%);
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-family: var(--mono); font-size: .72rem; color: var(--c);
+      letter-spacing: .2em; text-transform: uppercase;
+      margin-bottom: 28px; position: relative; z-index: 1;
+      opacity: 0; transform: translateY(20px);
+    }
+    .hero-tag::before { content: ''; width: 32px; height: 1px; background: var(--c); }
+    .cs-hero h1 {
+      font-size: clamp(4.5rem, 14vw, 13rem);
+      font-weight: 700; letter-spacing: -.04em; line-height: .92;
+      position: relative; z-index: 1;
+      opacity: 0; transform: translateY(40px);
+    }
+    /* Gradient word title */
+    .cs-hero h1 .title-gradient {
+      background: linear-gradient(135deg, #c084fc 0%, #a855f7 30%, #ffd700 70%, #f59e0b 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-meta-row {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 32px; margin-top: 48px; position: relative; z-index: 1;
+      opacity: 0; transform: translateY(20px);
+    }
+    .hero-desc {
+      max-width: 520px; font-size: clamp(.9rem,1.4vw,1.1rem);
+      color: var(--muted); line-height: 1.8;
+    }
+    .hero-chips { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .hero-chip {
+      font-family: var(--mono); font-size: .65rem; letter-spacing: .1em;
+      padding: 6px 14px; border-radius: 100px;
+      border: 1px solid var(--border); color: var(--muted);
+    }
+    .scroll-hint {
+      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+      font-family: var(--mono); font-size: .65rem; color: var(--muted);
+      letter-spacing: .2em; display: flex; flex-direction: column; align-items: center; gap: 10px;
+      z-index: 1; opacity: 0;
+    }
+    .scroll-line { width: 1px; height: 48px; background: linear-gradient(to bottom, var(--muted), transparent); animation: scrollPulse 2s ease-in-out infinite; }
+    @keyframes scrollPulse { 0%,100% { opacity:.4; transform:scaleY(1); } 50% { opacity:1; transform:scaleY(.6); } }
+
+    /* ── META STRIP ── */
+    .cs-meta {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      padding: 0 clamp(2rem,7vw,8rem);
+      opacity: 0; transform: translateY(30px);
+    }
+    .meta-item {
+      padding: 36px 0; border-right: 1px solid var(--border);
+      padding-right: 32px; padding-left: 32px;
+    }
+    .meta-item:first-child { padding-left: 0; }
+    .meta-item:last-child  { border-right: none; }
+    .meta-label { font-family: var(--mono); font-size: .62rem; color: var(--muted); letter-spacing: .2em; text-transform: uppercase; margin-bottom: 10px; }
+    .meta-value { font-size: 1rem; font-weight: 600; letter-spacing: -.02em; }
+
+    /* ── SECTIONS ── */
+    .cs-section {
+      padding: clamp(5rem,10vw,10rem) clamp(2rem,7vw,8rem);
+      position: relative;
+    }
+    .section-label {
+      font-family: var(--mono); font-size: .68rem; color: var(--p);
+      letter-spacing: .22em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 12px; margin-bottom: 40px;
+    }
+    .section-label::before { content: ''; width: 28px; height: 1px; background: var(--p); }
+    .cs-section h2 {
+      font-size: clamp(2.2rem,5vw,4.5rem); font-weight: 700;
+      letter-spacing: -.04em; line-height: 1.05; margin-bottom: 32px;
+    }
+    .cs-section h2 em { color: var(--c); font-style: normal; }
+    .cs-body {
+      font-size: clamp(.95rem,1.4vw,1.1rem); color: var(--muted);
+      line-height: 1.85; max-width: 680px;
+    }
+    .cs-body + .cs-body { margin-top: 24px; }
+
+    /* ── TWO-COL ── */
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: clamp(3rem,6vw,8rem);
+      align-items: start;
+    }
+
+    /* ── FULL-BLEED IMAGE ── */
+    .cs-img-full {
+      width: 100%; aspect-ratio: 16/8;
+      border-radius: 24px; overflow: hidden;
+      border: 1px solid var(--border);
+      position: relative;
+      opacity: 0; transform: translateY(40px);
+    }
+    .cs-img-full img { width:100%; height:100%; object-fit:cover; display:block; }
+    .cs-img-full .img-placeholder {
+      width:100%; height:100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── IMAGE GRID ── */
+    .cs-img-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+      margin-top: 64px;
+      opacity: 0; transform: translateY(40px);
+    }
+    .cs-img-grid .cs-img-tile {
+      aspect-ratio: 4/3; border-radius: 20px; overflow: hidden;
+      border: 1px solid var(--border); position: relative;
+    }
+    .cs-img-grid .cs-img-tile img { width:100%; height:100%; object-fit:cover; display:block; }
+    .cs-img-grid .cs-img-tile.tall { grid-row: span 2; aspect-ratio: auto; min-height: 400px; }
+
+    /* ── FEATURE LIST ── */
+    .feature-list {
+      display: flex; flex-direction: column; gap: 0;
+      margin-top: 56px; border-top: 1px solid var(--border);
+    }
+    .feature-row {
+      display: grid; grid-template-columns: 56px 1fr 1fr;
+      gap: 0 clamp(2rem,4vw,5rem);
+      padding: 36px 0; border-bottom: 1px solid var(--border);
+      align-items: start;
+      opacity: 0; transform: translateX(-20px);
+      transition: background .25s;
+    }
+    .feature-row:hover { background: rgba(255,255,255,.015); }
+    .feature-num { font-family: var(--mono); font-size: .72rem; color: var(--muted); padding-top: 4px; }
+    .feature-title { font-size: clamp(1.2rem,2vw,1.65rem); font-weight: 700; letter-spacing: -.03em; }
+    .feature-desc  { font-size: .9rem; color: var(--muted); line-height: 1.8; }
+
+    /* ── METRICS ── */
+    .metrics-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 2px; margin-top: 64px;
+      border: 1px solid var(--border); border-radius: 20px; overflow: hidden;
+    }
+    .metric-card {
+      background: var(--surface); padding: 40px 36px;
+      border-right: 1px solid var(--border);
+      opacity: 0; transform: translateY(20px);
+    }
+    .metric-card:last-child { border-right: none; }
+    .metric-n {
+      font-size: clamp(3rem,6vw,5.5rem); font-weight: 700;
+      letter-spacing: -.04em; line-height: 1;
+      background: linear-gradient(135deg, var(--y), var(--p));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .metric-l { font-size: .85rem; color: var(--muted); margin-top: 12px; line-height: 1.5; }
+
+    /* ── PROCESS ── */
+    .process-items {
+      margin-top: 56px; display: flex; flex-direction: column; gap: 0;
+      border-top: 1px solid var(--border);
+    }
+    .process-item {
+      display: grid; grid-template-columns: 80px 1fr;
+      gap: 0 clamp(2rem,4vw,5rem);
+      padding: 40px 0; border-bottom: 1px solid var(--border);
+      opacity: 0; transform: translateY(20px);
+    }
+    .pi-idx { font-family: var(--mono); font-size: .72rem; color: var(--muted); padding-top: 6px; }
+    .pi-content h3 { font-size: clamp(1.4rem,2.5vw,2rem); font-weight: 700; letter-spacing: -.03em; margin-bottom: 16px; }
+    .pi-content p  { font-size: .9rem; color: var(--muted); line-height: 1.85; max-width: 640px; }
+
+    /* ── QUOTE ── */
+    .cs-quote {
+      padding: clamp(4rem,8vw,8rem) clamp(2rem,7vw,8rem);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      position: relative; overflow: hidden;
+      opacity: 0; transform: translateY(30px);
+    }
+    .cs-quote::before {
+      content: '"'; position: absolute; top: -40px; left: clamp(2rem,7vw,8rem);
+      font-size: clamp(14rem,22vw,22rem); line-height: 1;
+      font-family: var(--sans); font-weight: 700; color: rgba(255,215,0,.06);
+      pointer-events: none;
+    }
+    .cs-quote blockquote {
+      font-size: clamp(1.5rem,3.5vw,3rem); font-weight: 600;
+      letter-spacing: -.03em; line-height: 1.3; max-width: 900px;
+      position: relative; z-index: 1;
+    }
+    .cs-quote blockquote em { color: var(--y); font-style: normal; }
+
+    /* ── NEXT PROJECT ── */
+    .cs-next {
+      padding: clamp(5rem,10vw,10rem) clamp(2rem,7vw,8rem);
+      display: flex; flex-direction: column;
+      border-top: 1px solid var(--border);
+      position: relative; overflow: hidden;
+      opacity: 0; transform: translateY(30px);
+    }
+    .cs-next .next-label {
+      font-family: var(--mono); font-size: .68rem; color: var(--muted);
+      letter-spacing: .2em; text-transform: uppercase; margin-bottom: 32px;
+    }
+    .cs-next h2 {
+      font-size: clamp(2.5rem,7vw,7rem); font-weight: 700;
+      letter-spacing: -.04em; line-height: .95;
+      transition: color .3s;
+    }
+    .cs-next:hover h2 { color: var(--y); }
+    .cs-next a { text-decoration: none; color: inherit; display: flex; flex-direction: column; }
+    .next-arrow {
+      width: 64px; height: 64px; border-radius: 50%;
+      border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-top: 40px;
+      transition: background .3s, border-color .3s, transform .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    .cs-next:hover .next-arrow { background: var(--y); border-color: var(--y); color: var(--bg); transform: rotate(45deg) scale(1.1); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 28px clamp(2rem,5vw,5rem);
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--mono); font-size: .7rem; color: var(--muted);
+    }
+    footer a { color: var(--p); text-decoration: none; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      nav { left:0; right:0; transform:none; top:0; border-radius:0; border-left:none; border-right:none; border-top:none; width:100%; }
+      .cs-meta { grid-template-columns: 1fr 1fr; }
+      .meta-item:nth-child(2) { border-right: none; }
+      .two-col { grid-template-columns: 1fr; }
+      .cs-img-grid { grid-template-columns: 1fr; }
+      .cs-img-grid .cs-img-tile.tall { aspect-ratio: 4/3; grid-row: auto; min-height: auto; }
+      .feature-row { grid-template-columns: 44px 1fr; grid-template-rows: auto auto; gap: 6px 12px; }
+      .feature-num   { grid-row:1; grid-column:1; }
+      .feature-title { grid-row:1; grid-column:2; }
+      .feature-desc  { grid-row:2; grid-column:1/-1; padding-top:6px; }
+      .metrics-grid  { grid-template-columns: 1fr; }
+      .metric-card   { border-right: none; border-bottom: 1px solid var(--border); }
+      .metric-card:last-child { border-bottom: none; }
+      .process-item  { grid-template-columns: 44px 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="index.html" class="nav-back"><span class="arrow">←</span> Back to Portfolio</a>
+  <span class="nav-logo">RA</span>
+  <a href="index.html#contact" class="nav-cta">Let's Talk</a>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="cs-hero">
+  <div class="hero-gradient"></div>
+  <div class="hero-grid-lines"></div>
+
+  <div class="hero-tag">Case Study · Product Design · 2026</div>
+  <h1><span class="title-gradient">Promptra</span></h1>
+
+  <div class="hero-meta-row">
+    <p class="hero-desc">A social platform for prompts — where creators share, remix, and evolve AI prompts through community-driven versioning. Not just a prompt library. A living creative ecosystem.</p>
+    <div class="hero-chips">
+      <span class="hero-chip">Social Platform</span>
+      <span class="hero-chip">AI Prompts</span>
+      <span class="hero-chip">Community</span>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>SCROLL</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ── META STRIP ── -->
+<div class="cs-meta">
+  <div class="meta-item">
+    <div class="meta-label">Role</div>
+    <div class="meta-value">Product Designer</div>
+  </div>
+  <div class="meta-item">
+    <div class="meta-label">Year</div>
+    <div class="meta-value">2026</div>
+  </div>
+  <div class="meta-item">
+    <div class="meta-label">Type</div>
+    <div class="meta-value">Social Platform (0 → 1)</div>
+  </div>
+  <div class="meta-item">
+    <div class="meta-label">Tools</div>
+    <div class="meta-value">Figma · Notion · Miro</div>
+  </div>
+</div>
+
+<!-- ── HERO IMAGE ── -->
+<div class="cs-section" style="padding-top:80px; padding-bottom:0">
+  <div class="cs-img-full">
+    <div class="img-placeholder" style="background: linear-gradient(135deg, #0e0e1c 0%, #1a1030 40%, #1a1400 100%);">
+      <svg width="100%" height="100%" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="heroGradP" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#0e0e1c"/>
+            <stop offset="50%"  stop-color="#1a1030"/>
+            <stop offset="100%" stop-color="#161200"/>
+          </linearGradient>
+          <linearGradient id="accentP" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#a855f7"/>
+            <stop offset="100%" stop-color="#ffd700"/>
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="600" fill="url(#heroGradP)"/>
+        <!-- Top nav bar of app -->
+        <rect x="80" y="48" width="1040" height="52" rx="12" fill="rgba(20,16,40,0.95)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+        <rect x="104" y="62" width="90" height="12" rx="4" fill="rgba(168,85,247,0.7)"/>
+        <rect x="210" y="62" width="60" height="12" rx="4" fill="rgba(255,255,255,0.18)"/>
+        <rect x="284" y="62" width="60" height="12" rx="4" fill="rgba(255,255,255,0.18)"/>
+        <rect x="940" y="58" width="80" height="20" rx="100" fill="url(#accentP)" opacity="0.9"/>
+        <!-- Main layout: sidebar + feed -->
+        <rect x="80" y="116" width="210" height="436" rx="12" fill="rgba(16,12,32,0.9)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <!-- Sidebar items -->
+        <rect x="96" y="136" width="178" height="32" rx="8" fill="rgba(168,85,247,0.18)"/>
+        <rect x="108" y="146" width="80" height="10" rx="4" fill="rgba(168,85,247,0.7)"/>
+        <rect x="96" y="178" width="178" height="30" rx="6" fill="rgba(255,255,255,0.03)"/>
+        <rect x="108" y="188" width="64" height="10" rx="4" fill="rgba(255,255,255,0.2)"/>
+        <rect x="96" y="216" width="178" height="30" rx="6" fill="rgba(255,255,255,0.03)"/>
+        <rect x="108" y="226" width="72" height="10" rx="4" fill="rgba(255,255,255,0.2)"/>
+        <rect x="96" y="254" width="178" height="30" rx="6" fill="rgba(255,255,255,0.03)"/>
+        <rect x="108" y="264" width="56" height="10" rx="4" fill="rgba(255,255,255,0.2)"/>
+        <!-- Divider in sidebar -->
+        <rect x="96" y="300" width="178" height="1" fill="rgba(255,255,255,0.05)"/>
+        <rect x="108" y="316" width="50" height="8" rx="4" fill="rgba(110,109,138,0.35)"/>
+        <!-- Small avatar + name items -->
+        <circle cx="116" cy="342" r="10" fill="rgba(255,215,0,0.2)"/>
+        <rect x="132" y="337" width="60" height="8" rx="4" fill="rgba(255,255,255,0.3)"/>
+        <circle cx="116" cy="368" r="10" fill="rgba(168,85,247,0.25)"/>
+        <rect x="132" y="363" width="72" height="8" rx="4" fill="rgba(255,255,255,0.3)"/>
+        <circle cx="116" cy="394" r="10" fill="rgba(0,255,209,0.15)"/>
+        <rect x="132" y="389" width="55" height="8" rx="4" fill="rgba(255,255,255,0.3)"/>
+        <!-- Feed area -->
+        <!-- Prompt card 1 -->
+        <rect x="308" y="116" width="350" height="142" rx="14" fill="rgba(20,16,40,0.85)" stroke="rgba(168,85,247,0.22)" stroke-width="1"/>
+        <rect x="326" y="134" width="120" height="10" rx="4" fill="rgba(255,255,255,0.5)"/>
+        <rect x="326" y="152" width="290" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
+        <rect x="326" y="166" width="250" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
+        <rect x="326" y="184" width="270" height="8" rx="4" fill="rgba(110,109,138,0.25)"/>
+        <rect x="326" y="200" width="68" height="20" rx="100" fill="rgba(168,85,247,0.12)" stroke="rgba(168,85,247,0.35)" stroke-width="1"/>
+        <rect x="404" y="200" width="56" height="20" rx="100" fill="rgba(255,215,0,0.1)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
+        <!-- Fork count / like count -->
+        <rect x="500" y="202" width="50" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
+        <rect x="560" y="202" width="50" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
+        <!-- Prompt card 2 -->
+        <rect x="308" y="272" width="350" height="142" rx="14" fill="rgba(20,16,40,0.85)" stroke="rgba(255,215,0,0.18)" stroke-width="1"/>
+        <rect x="326" y="290" width="140" height="10" rx="4" fill="rgba(255,255,255,0.5)"/>
+        <rect x="326" y="308" width="290" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
+        <rect x="326" y="322" width="220" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
+        <rect x="326" y="336" width="260" height="8" rx="4" fill="rgba(110,109,138,0.25)"/>
+        <rect x="326" y="354" width="56" height="20" rx="100" fill="rgba(255,215,0,0.1)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
+        <rect x="392" y="354" width="68" height="20" rx="100" fill="rgba(168,85,247,0.12)" stroke="rgba(168,85,247,0.35)" stroke-width="1"/>
+        <rect x="500" y="356" width="50" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
+        <!-- Prompt card 3 (partial) -->
+        <rect x="308" y="428" width="350" height="104" rx="14" fill="rgba(20,16,40,0.85)" stroke="rgba(0,255,209,0.12)" stroke-width="1"/>
+        <rect x="326" y="448" width="100" height="10" rx="4" fill="rgba(255,255,255,0.5)"/>
+        <rect x="326" y="466" width="280" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
+        <rect x="326" y="480" width="240" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
+        <!-- Version tree panel -->
+        <rect x="676" y="116" width="444" height="436" rx="14" fill="rgba(16,12,28,0.92)" stroke="rgba(255,215,0,0.12)" stroke-width="1"/>
+        <rect x="696" y="136" width="120" height="12" rx="4" fill="rgba(255,255,255,0.35)"/>
+        <rect x="696" y="156" width="80" height="8" rx="4" fill="rgba(110,109,138,0.35)"/>
+        <!-- Version timeline -->
+        <!-- Line -->
+        <line x1="730" y1="192" x2="730" y2="490" stroke="rgba(168,85,247,0.25)" stroke-width="2" stroke-dasharray="4 4"/>
+        <!-- v1.0 node -->
+        <circle cx="730" cy="200" r="10" fill="rgba(168,85,247,0.3)" stroke="rgba(168,85,247,0.7)" stroke-width="1.5"/>
+        <rect x="752" y="194" width="44" height="8" rx="3" fill="rgba(168,85,247,0.6)"/>
+        <rect x="752" y="208" width="120" height="7" rx="3" fill="rgba(110,109,138,0.4)"/>
+        <rect x="886" y="194" width="80" height="20" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+        <rect x="894" y="200" width="60" height="8" rx="3" fill="rgba(110,109,138,0.35)"/>
+        <!-- v1.2 node -->
+        <circle cx="730" cy="272" r="10" fill="rgba(255,215,0,0.25)" stroke="rgba(255,215,0,0.65)" stroke-width="1.5"/>
+        <rect x="752" y="266" width="44" height="8" rx="3" fill="rgba(255,215,0,0.6)"/>
+        <rect x="752" y="280" width="140" height="7" rx="3" fill="rgba(110,109,138,0.4)"/>
+        <rect x="886" y="266" width="80" height="20" rx="6" fill="rgba(255,215,0,0.06)" stroke="rgba(255,215,0,0.2)" stroke-width="1"/>
+        <rect x="894" y="272" width="60" height="8" rx="3" fill="rgba(255,215,0,0.4)"/>
+        <!-- branch off v1.2 -->
+        <line x1="730" y1="282" x2="790" y2="330" stroke="rgba(0,255,209,0.2)" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <circle cx="798" cy="334" r="8" fill="rgba(0,255,209,0.15)" stroke="rgba(0,255,209,0.45)" stroke-width="1.5"/>
+        <rect x="816" y="328" width="40" height="7" rx="3" fill="rgba(0,255,209,0.4)"/>
+        <rect x="816" y="340" width="110" height="6" rx="3" fill="rgba(110,109,138,0.3)"/>
+        <!-- v2.0 node — "community pick" highlight -->
+        <circle cx="730" cy="400" r="12" fill="rgba(168,85,247,0.45)" stroke="rgba(168,85,247,1)" stroke-width="2"/>
+        <rect x="754" y="393" width="44" height="8" rx="3" fill="rgba(255,255,255,0.7)"/>
+        <rect x="754" y="407" width="160" height="7" rx="3" fill="rgba(110,109,138,0.45)"/>
+        <rect x="886" y="390" width="100" height="24" rx="100" fill="rgba(168,85,247,0.18)" stroke="rgba(168,85,247,0.5)" stroke-width="1"/>
+        <rect x="896" y="397" width="78" height="8" rx="3" fill="rgba(168,85,247,0.7)"/>
+        <!-- v2.1 node -->
+        <circle cx="730" cy="470" r="10" fill="rgba(255,215,0,0.2)" stroke="rgba(255,215,0,0.5)" stroke-width="1.5"/>
+        <rect x="752" y="464" width="44" height="8" rx="3" fill="rgba(255,215,0,0.5)"/>
+        <rect x="752" y="478" width="130" height="7" rx="3" fill="rgba(110,109,138,0.35)"/>
+        <!-- Glow accents -->
+        <ellipse cx="900" cy="300" rx="160" ry="80" fill="rgba(255,215,0,0.04)"/>
+        <ellipse cx="490" cy="250" rx="130" ry="60" fill="rgba(168,85,247,0.05)"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ── OVERVIEW ── -->
+<section class="cs-section">
+  <div class="two-col">
+    <div>
+      <div class="section-label">Overview</div>
+      <h2>Prompts deserve more than a <em>static list</em></h2>
+    </div>
+    <div style="padding-top: 80px;">
+      <p class="cs-body">Every AI prompt tool today is essentially a library — you browse, you copy, you leave. Promptra was designed around a different idea: what if prompts could evolve, like code on GitHub? What if the community could build on each other's work in real time?</p>
+      <p class="cs-body">The product centres on two core features — Creator Studio for remixing and building on prompts directly within the platform, and Versioning for tracking how prompts evolve through community iterations.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── QUOTE ── -->
+<div class="cs-quote">
+  <blockquote>"Prompts are ideas. Ideas deserve <em>version control</em>."</blockquote>
+</div>
+
+<!-- ── FEATURES ── -->
+<section class="cs-section">
+  <div class="section-label">Core Features</div>
+  <h2>Built for <em>collaboration</em></h2>
+
+  <div class="feature-list">
+    <div class="feature-row">
+      <span class="feature-num">[01]</span>
+      <h3 class="feature-title">Creator Studio</h3>
+      <p class="feature-desc">A rich in-platform editor where users can fork any prompt, modify it, annotate their changes, and publish the new version — crediting the original creator automatically.</p>
+    </div>
+    <div class="feature-row">
+      <span class="feature-num">[02]</span>
+      <h3 class="feature-title">Prompt Versioning</h3>
+      <p class="feature-desc">Every prompt has a version tree. See how it started, who changed what, and which version the community rated highest. Think GitHub diffs, but for creative prompts.</p>
+    </div>
+    <div class="feature-row">
+      <span class="feature-num">[03]</span>
+      <h3 class="feature-title">Social Feed</h3>
+      <p class="feature-desc">A curated feed of trending prompts, new versions, and community remixes — sorted by usefulness, recency, or category. Follow creators, bookmark prompts, leave structured feedback.</p>
+    </div>
+    <div class="feature-row">
+      <span class="feature-num">[04]</span>
+      <h3 class="feature-title">Category Intelligence</h3>
+      <p class="feature-desc">Prompts are auto-tagged by model, use case, and output type. Smart filtering helps users find exactly what they need — and discover what they didn't know they needed.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── MOCKUP GRID ── -->
+<section class="cs-section" style="padding-top:0">
+  <div class="cs-img-grid">
+
+    <!-- Tile 1: Social Feed with prompt cards (tall) -->
+    <div class="cs-img-tile tall">
+      <div style="width:100%;height:100%;background:linear-gradient(160deg,#1a1030,#161200);display:flex;align-items:center;justify-content:center;">
+        <svg width="100%" height="100%" viewBox="0 0 400 560" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gp1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#1a1030"/>
+              <stop offset="100%" stop-color="#161200"/>
+            </linearGradient>
+            <linearGradient id="tagGradP" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#a855f7"/>
+              <stop offset="100%" stop-color="#ffd700"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="560" fill="url(#gp1)"/>
+          <!-- Header -->
+          <rect x="20" y="24" width="360" height="40" rx="10" fill="rgba(24,18,48,0.9)"/>
+          <rect x="36" y="36" width="80" height="10" rx="4" fill="url(#tagGradP)" opacity="0.8"/>
+          <circle cx="356" cy="44" r="14" fill="rgba(168,85,247,0.2)" stroke="rgba(168,85,247,0.4)" stroke-width="1"/>
+          <!-- Prompt card 1 -->
+          <rect x="20" y="80" width="360" height="130" rx="14" fill="rgba(24,18,48,0.85)" stroke="rgba(168,85,247,0.2)" stroke-width="1"/>
+          <!-- Avatar row -->
+          <circle cx="40" cy="100" r="12" fill="rgba(255,215,0,0.25)"/>
+          <rect x="58" y="94" width="70" height="9" rx="4" fill="rgba(255,255,255,0.5)"/>
+          <rect x="58" y="107" width="50" height="7" rx="4" fill="rgba(110,109,138,0.4)"/>
+          <rect x="320" y="94" width="44" height="18" rx="100" fill="rgba(255,215,0,0.12)" stroke="rgba(255,215,0,0.35)" stroke-width="1"/>
+          <!-- Prompt text lines -->
+          <rect x="36" y="126" width="320" height="8" rx="4" fill="rgba(255,255,255,0.28)"/>
+          <rect x="36" y="140" width="290" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
+          <rect x="36" y="154" width="200" height="8" rx="4" fill="rgba(255,255,255,0.14)"/>
+          <!-- Tags + stats -->
+          <rect x="36" y="174" width="60" height="18" rx="100" fill="rgba(168,85,247,0.12)" stroke="rgba(168,85,247,0.35)" stroke-width="1"/>
+          <rect x="104" y="174" width="50" height="18" rx="100" fill="rgba(255,215,0,0.1)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
+          <rect x="290" y="177" width="40" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
+          <rect x="336" y="177" width="30" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
+          <!-- Prompt card 2 -->
+          <rect x="20" y="226" width="360" height="130" rx="14" fill="rgba(24,18,48,0.85)" stroke="rgba(255,215,0,0.15)" stroke-width="1"/>
+          <circle cx="40" cy="246" r="12" fill="rgba(168,85,247,0.25)"/>
+          <rect x="58" y="240" width="80" height="9" rx="4" fill="rgba(255,255,255,0.5)"/>
+          <rect x="58" y="253" width="55" height="7" rx="4" fill="rgba(110,109,138,0.4)"/>
+          <rect x="310" y="240" width="54" height="18" rx="100" fill="rgba(168,85,247,0.12)" stroke="rgba(168,85,247,0.35)" stroke-width="1"/>
+          <rect x="36" y="272" width="310" height="8" rx="4" fill="rgba(255,255,255,0.28)"/>
+          <rect x="36" y="286" width="280" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
+          <rect x="36" y="300" width="180" height="8" rx="4" fill="rgba(255,255,255,0.14)"/>
+          <rect x="36" y="320" width="54" height="18" rx="100" fill="rgba(255,215,0,0.1)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
+          <rect x="98" y="320" width="60" height="18" rx="100" fill="rgba(0,255,209,0.08)" stroke="rgba(0,255,209,0.2)" stroke-width="1"/>
+          <rect x="290" y="323" width="40" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
+          <rect x="336" y="323" width="30" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
+          <!-- Prompt card 3 -->
+          <rect x="20" y="372" width="360" height="130" rx="14" fill="rgba(24,18,48,0.85)" stroke="rgba(0,255,209,0.1)" stroke-width="1"/>
+          <circle cx="40" cy="392" r="12" fill="rgba(0,255,209,0.15)"/>
+          <rect x="58" y="386" width="60" height="9" rx="4" fill="rgba(255,255,255,0.5)"/>
+          <rect x="58" y="399" width="45" height="7" rx="4" fill="rgba(110,109,138,0.4)"/>
+          <rect x="36" y="418" width="300" height="8" rx="4" fill="rgba(255,255,255,0.28)"/>
+          <rect x="36" y="432" width="260" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
+          <rect x="36" y="446" width="200" height="8" rx="4" fill="rgba(255,255,255,0.14)"/>
+          <rect x="36" y="466" width="60" height="18" rx="100" fill="rgba(168,85,247,0.12)" stroke="rgba(168,85,247,0.35)" stroke-width="1"/>
+          <rect x="104" y="466" width="44" height="18" rx="100" fill="rgba(255,215,0,0.1)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
+          <!-- Glow -->
+          <ellipse cx="200" cy="280" rx="140" ry="60" fill="rgba(168,85,247,0.05)"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Tile 2: Version Tree / Timeline -->
+    <div class="cs-img-tile">
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,#12082a,#1a1400);">
+        <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gp2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#12082a"/>
+              <stop offset="100%" stop-color="#1a1400"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="300" fill="url(#gp2)"/>
+          <rect x="20" y="20" width="360" height="260" rx="14" fill="rgba(16,10,36,0.8)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+          <!-- Title -->
+          <rect x="36" y="36" width="110" height="10" rx="4" fill="rgba(255,255,255,0.35)"/>
+          <rect x="36" y="52" width="70" height="7" rx="4" fill="rgba(110,109,138,0.35)"/>
+          <!-- Vertical timeline line -->
+          <line x1="74" y1="82" x2="74" y2="260" stroke="rgba(168,85,247,0.2)" stroke-width="2" stroke-dasharray="4 4"/>
+          <!-- v1.0 -->
+          <circle cx="74" cy="90" r="9" fill="rgba(168,85,247,0.25)" stroke="rgba(168,85,247,0.65)" stroke-width="1.5"/>
+          <rect x="94" y="84" width="36" height="8" rx="3" fill="rgba(168,85,247,0.55)"/>
+          <rect x="94" y="96" width="110" height="6" rx="3" fill="rgba(110,109,138,0.35)"/>
+          <!-- v1.1 -->
+          <circle cx="74" cy="142" r="9" fill="rgba(255,215,0,0.2)" stroke="rgba(255,215,0,0.5)" stroke-width="1.5"/>
+          <rect x="94" y="136" width="36" height="8" rx="3" fill="rgba(255,215,0,0.55)"/>
+          <rect x="94" y="148" width="130" height="6" rx="3" fill="rgba(110,109,138,0.35)"/>
+          <!-- Branch from v1.1 -->
+          <line x1="74" y1="151" x2="120" y2="184" stroke="rgba(0,255,209,0.2)" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <circle cx="128" cy="190" r="8" fill="rgba(0,255,209,0.12)" stroke="rgba(0,255,209,0.4)" stroke-width="1.5"/>
+          <rect x="144" y="185" width="36" height="7" rx="3" fill="rgba(0,255,209,0.4)"/>
+          <rect x="144" y="196" width="90" height="6" rx="3" fill="rgba(110,109,138,0.3)"/>
+          <!-- v2.0 — community pick -->
+          <circle cx="74" cy="218" r="11" fill="rgba(168,85,247,0.4)" stroke="rgba(168,85,247,1)" stroke-width="2"/>
+          <rect x="94" y="212" width="36" height="8" rx="3" fill="rgba(255,255,255,0.7)"/>
+          <rect x="94" y="224" width="130" height="6" rx="3" fill="rgba(110,109,138,0.4)"/>
+          <rect x="254" y="210" width="96" height="20" rx="100" fill="rgba(168,85,247,0.15)" stroke="rgba(168,85,247,0.45)" stroke-width="1"/>
+          <rect x="264" y="216" width="74" height="8" rx="3" fill="rgba(168,85,247,0.65)"/>
+          <!-- Glow -->
+          <ellipse cx="200" cy="160" rx="100" ry="50" fill="rgba(255,215,0,0.04)"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Tile 3: Creator Studio Editor Panel -->
+    <div class="cs-img-tile">
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,#0e0820,#1a1200);">
+        <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gp3" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#0e0820"/>
+              <stop offset="100%" stop-color="#1a1200"/>
+            </linearGradient>
+            <linearGradient id="btnGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#a855f7"/>
+              <stop offset="100%" stop-color="#ffd700"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="300" fill="url(#gp3)"/>
+          <rect x="20" y="20" width="360" height="260" rx="14" fill="rgba(14,10,28,0.88)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+          <!-- Editor toolbar -->
+          <rect x="20" y="20" width="360" height="36" rx="14" fill="rgba(20,14,40,0.95)"/>
+          <rect x="20" y="40" width="360" height="16" rx="0" fill="rgba(20,14,40,0.95)"/>
+          <rect x="36" y="30" width="80" height="8" rx="3" fill="rgba(168,85,247,0.6)"/>
+          <rect x="256" y="26" width="56" height="20" rx="100" fill="url(#btnGrad)" opacity="0.9"/>
+          <rect x="264" y="32" width="40" height="8" rx="3" fill="rgba(14,10,28,0.9)"/>
+          <!-- Tab bar -->
+          <rect x="20" y="56" width="360" height="28" rx="0" fill="rgba(12,8,24,0.8)"/>
+          <rect x="36" y="64" width="70" height="10" rx="3" fill="rgba(255,255,255,0.35)" />
+          <rect x="116" y="68" width="60" height="6" rx="3" fill="rgba(110,109,138,0.25)"/>
+          <rect x="186" y="68" width="60" height="6" rx="3" fill="rgba(110,109,138,0.25)"/>
+          <!-- Edit area -->
+          <rect x="36" y="98" width="320" height="10" rx="4" fill="rgba(255,255,255,0.22)"/>
+          <rect x="36" y="116" width="280" height="10" rx="4" fill="rgba(255,255,255,0.18)"/>
+          <!-- Highlighted diff line -->
+          <rect x="36" y="134" width="320" height="14" rx="4" fill="rgba(255,215,0,0.1)" stroke="rgba(255,215,0,0.2)" stroke-width="1"/>
+          <rect x="44" y="139" width="260" height="8" rx="3" fill="rgba(255,215,0,0.55)"/>
+          <!-- More lines -->
+          <rect x="36" y="158" width="240" height="10" rx="4" fill="rgba(255,255,255,0.18)"/>
+          <rect x="36" y="176" width="300" height="10" rx="4" fill="rgba(255,255,255,0.14)"/>
+          <!-- Added line -->
+          <rect x="36" y="194" width="320" height="14" rx="4" fill="rgba(168,85,247,0.1)" stroke="rgba(168,85,247,0.22)" stroke-width="1"/>
+          <rect x="44" y="199" width="200" height="8" rx="3" fill="rgba(168,85,247,0.55)"/>
+          <!-- Annotation bubble -->
+          <rect x="180" y="218" width="164" height="44" rx="10" fill="rgba(168,85,247,0.12)" stroke="rgba(168,85,247,0.35)" stroke-width="1"/>
+          <rect x="192" y="228" width="60" height="7" rx="3" fill="rgba(255,255,255,0.5)"/>
+          <rect x="192" y="240" width="140" height="6" rx="3" fill="rgba(110,109,138,0.4)"/>
+          <rect x="192" y="250" width="110" height="6" rx="3" fill="rgba(110,109,138,0.3)"/>
+          <!-- Cursor blink -->
+          <rect x="36" y="212" width="2" height="16" rx="1" fill="rgba(168,85,247,0.9)"/>
+          <!-- Glow -->
+          <ellipse cx="200" cy="160" rx="120" ry="50" fill="rgba(168,85,247,0.05)"/>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── PROCESS ── -->
+<section class="cs-section">
+  <div class="section-label">Design Process</div>
+  <h2>How it <em>came to life</em></h2>
+  <div class="process-items">
+    <div class="process-item">
+      <span class="pi-idx">Pre-Game</span>
+      <div class="pi-content">
+        <h3>Alignment & Research</h3>
+        <p>Audited PromptBase, PromptHero, and FlowGPT. All had the same flaw — prompts were static, undiscoverable after publishing, and had no feedback loop. Defined two core user types: creators who build prompts, and consumers who use and remix them.</p>
+      </div>
+    </div>
+    <div class="process-item">
+      <span class="pi-idx">Game</span>
+      <div class="pi-content">
+        <h3>Design & Iteration</h3>
+        <p>The version tree was the most complex UX challenge — making a branching data structure feel intuitive to non-technical users. Solved it with a visual timeline metaphor instead of a tree diagram. Creator Studio went through 5 iterations before the fork/edit/publish flow felt natural.</p>
+      </div>
+    </div>
+    <div class="process-item">
+      <span class="pi-idx">Post Game</span>
+      <div class="pi-content">
+        <h3>Handoff & QA</h3>
+        <p>Delivered interaction specs for the version timeline animation, Creator Studio transitions, and the social feed scroll behaviour. QA focus was on the versioning UI — ensuring branch state was always clear and never confusing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── METRICS ── -->
+<section class="cs-section" style="padding-top:0">
+  <div class="section-label">Outcomes</div>
+  <h2>What it <em>delivered</em></h2>
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-n">2</div>
+      <div class="metric-l">Net-new product concepts (Creator Studio + Versioning) with no direct market equivalent</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-n">5×</div>
+      <div class="metric-l">Iterations to nail the fork/publish flow until it felt completely natural</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-n">0→1</div>
+      <div class="metric-l">Platform designed end-to-end, from blank canvas to full interaction spec</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── NEXT PROJECT ── -->
+<div class="cs-next">
+  <span class="next-label">Next Project</span>
+  <a href="case-studies.html">
+    <h2>Case Studies →</h2>
+    <div class="next-arrow">↗</div>
+  </a>
+</div>
+
+<footer>
+  <span>© 2026 Ronold Anthony</span>
+  <a href="index.html">← Back to Portfolio</a>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ── Cursor ──────────────────────────────────────────────────
+const dot  = document.getElementById('cur-dot');
+const ring = document.getElementById('cur-ring');
+let mx=0, my=0, rx=0, ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; gsap.set(dot,{x:mx,y:my}); });
+(function tick() { rx+=(mx-rx)*.13; ry+=(my-ry)*.13; gsap.set(ring,{x:rx,y:ry}); requestAnimationFrame(tick); })();
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', ()=>{ dot.classList.add('hov'); ring.classList.add('hov'); });
+  el.addEventListener('mouseleave', ()=>{ dot.classList.remove('hov'); ring.classList.remove('hov'); });
+});
+
+// ── Hero entrance ────────────────────────────────────────────
+gsap.to('.hero-tag',       { opacity:1, y:0, duration:.8, ease:'power3.out', delay:.2 });
+gsap.to('.cs-hero h1',     { opacity:1, y:0, duration:1, ease:'power4.out', delay:.4 });
+gsap.to('.hero-meta-row',  { opacity:1, y:0, duration:.8, ease:'power3.out', delay:.7 });
+gsap.to('.scroll-hint',    { opacity:1, duration:.8, delay:1.2 });
+
+// ── Meta strip ───────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.cs-meta', start: 'top 85%',
+  onEnter: () => gsap.to('.cs-meta', { opacity:1, y:0, duration:.8, ease:'power3.out' })
+});
+
+// ── Full-bleed images ────────────────────────────────────────
+gsap.utils.toArray('.cs-img-full').forEach(el => {
+  ScrollTrigger.create({
+    trigger: el, start: 'top 85%',
+    onEnter: () => gsap.to(el, { opacity:1, y:0, duration:1, ease:'power3.out' })
+  });
+});
+
+// ── Image grids ──────────────────────────────────────────────
+gsap.utils.toArray('.cs-img-grid').forEach(el => {
+  ScrollTrigger.create({
+    trigger: el, start: 'top 85%',
+    onEnter: () => gsap.to(el, { opacity:1, y:0, duration:1, ease:'power3.out' })
+  });
+});
+
+// ── Feature rows ─────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.feature-list', start: 'top 85%',
+  onEnter: () => gsap.to('.feature-row', { opacity:1, x:0, duration:.7, ease:'power3.out', stagger:.12 })
+});
+
+// ── Metrics ──────────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.metrics-grid', start: 'top 85%',
+  onEnter: () => gsap.to('.metric-card', { opacity:1, y:0, duration:.7, ease:'power3.out', stagger:.1 })
+});
+
+// ── Process items ────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.process-items', start: 'top 85%',
+  onEnter: () => gsap.to('.process-item', { opacity:1, y:0, duration:.7, ease:'power3.out', stagger:.15 })
+});
+
+// ── Quote ────────────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.cs-quote', start: 'top 85%',
+  onEnter: () => gsap.to('.cs-quote', { opacity:1, y:0, duration:.9, ease:'power3.out' })
+});
+
+// ── Next section ─────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.cs-next', start: 'top 85%',
+  onEnter: () => gsap.to('.cs-next', { opacity:1, y:0, duration:.8, ease:'power3.out' })
+});
+
+// ── Generic section reveals ──────────────────────────────────
+document.querySelectorAll('.cs-section').forEach(sec => {
+  ScrollTrigger.create({
+    trigger: sec, start: 'top 88%',
+    onEnter: () => {
+      gsap.from(sec.querySelectorAll('.section-label, h2, .cs-body, .two-col > div'), {
+        opacity:0, y:28, duration:.7, ease:'power3.out', stagger:.1
+      });
+    }
+  });
+});
+</script>
+
+</body>
+</html>

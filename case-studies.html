@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Case Studies — Ronold Anthony</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:       #07070f;
+      --surface:  #0e0e1c;
+      --surface2: #141428;
+      --p:        #8b5cf6;
+      --c:        #00ffd1;
+      --pk:       #ff3370;
+      --y:        #ffd700;
+      --text:     #f0eef8;
+      --muted:    #6e6d8a;
+      --border:   rgba(255,255,255,0.065);
+      --sans:     'Space Grotesk', sans-serif;
+      --mono:     'Space Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); overflow-x: hidden; cursor: none; }
+
+    /* grain */
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.035; pointer-events: none; z-index: 9999;
+    }
+
+    /* cursor */
+    #cur-dot  { width:8px; height:8px; background:var(--c); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:10001; transform:translate(-50%,-50%); mix-blend-mode:exclusion; }
+    #cur-ring { width:42px; height:42px; border:1.5px solid rgba(0,255,209,.35); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:10000; transform:translate(-50%,-50%); transition:width .35s cubic-bezier(.165,.84,.44,1), height .35s cubic-bezier(.165,.84,.44,1), border-color .3s; }
+    #cur-dot.hov  { width:14px; height:14px; background:var(--pk); }
+    #cur-ring.hov { width:64px; height:64px; border-color:rgba(255,51,112,.5); }
+    @media (max-width:768px) { body { cursor:auto; } #cur-dot,#cur-ring { display:none; } }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 32px; z-index: 1000;
+      background: rgba(14,14,28,.72); backdrop-filter: blur(18px);
+      border: 1px solid var(--border); border-radius: 100px;
+      padding: 10px 20px 10px 16px;
+      width: min(92vw, 720px);
+    }
+    .nav-back {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--mono); font-size: .72rem; color: var(--muted);
+      text-decoration: none; letter-spacing: .06em;
+      transition: color .3s;
+    }
+    .nav-back:hover { color: var(--c); }
+    .nav-back .arrow { font-size: 1rem; transition: transform .3s; }
+    .nav-back:hover .arrow { transform: translateX(-4px); }
+    .nav-logo { font-family: var(--mono); font-size: .8rem; color: var(--text); font-weight: 700; letter-spacing: .08em; }
+    .nav-cta {
+      font-family: var(--mono); font-size: .7rem; letter-spacing: .08em;
+      padding: 8px 18px; border-radius: 100px;
+      background: linear-gradient(135deg, var(--p), var(--c));
+      color: var(--bg); font-weight: 700; text-decoration: none;
+      transition: opacity .3s, transform .3s;
+      white-space: nowrap;
+    }
+    .nav-cta:hover { opacity: .85; transform: scale(1.04); }
+
+    /* ── HERO ── */
+    .cs-hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: flex-end; padding: clamp(6rem,10vw,10rem) clamp(2rem,7vw,8rem) clamp(3rem,6vw,6rem);
+      position: relative; overflow: hidden;
+    }
+    .hero-gradient {
+      position: absolute; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse 80% 70% at 60% 30%, rgba(139,92,246,.2) 0%, transparent 60%),
+                  radial-gradient(ellipse 50% 50% at 20% 80%, rgba(0,255,209,.1) 0%, transparent 55%);
+    }
+    .hero-grid-lines {
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 30%, transparent 100%);
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-family: var(--mono); font-size: .72rem; color: var(--c);
+      letter-spacing: .2em; text-transform: uppercase;
+      margin-bottom: 28px; position: relative; z-index: 1;
+      opacity: 0; transform: translateY(20px);
+    }
+    .hero-tag::before { content: ''; width: 32px; height: 1px; background: var(--c); }
+    .cs-hero h1 {
+      font-size: clamp(4.5rem, 14vw, 13rem);
+      font-weight: 700; letter-spacing: -.04em; line-height: .92;
+      position: relative; z-index: 1;
+      opacity: 0; transform: translateY(40px);
+    }
+    .cs-hero h1 .accent { color: var(--c); }
+    .hero-meta-row {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 32px; margin-top: 48px; position: relative; z-index: 1;
+      opacity: 0; transform: translateY(20px);
+    }
+    .hero-desc {
+      max-width: 520px; font-size: clamp(.9rem,1.4vw,1.1rem);
+      color: var(--muted); line-height: 1.8;
+    }
+    .hero-chips { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .hero-chip {
+      font-family: var(--mono); font-size: .65rem; letter-spacing: .1em;
+      padding: 6px 14px; border-radius: 100px;
+      border: 1px solid var(--border); color: var(--muted);
+    }
+    .scroll-hint {
+      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+      font-family: var(--mono); font-size: .65rem; color: var(--muted);
+      letter-spacing: .2em; display: flex; flex-direction: column; align-items: center; gap: 10px;
+      z-index: 1; opacity: 0;
+    }
+    .scroll-line { width: 1px; height: 48px; background: linear-gradient(to bottom, var(--muted), transparent); animation: scrollPulse 2s ease-in-out infinite; }
+    @keyframes scrollPulse { 0%,100% { opacity:.4; transform:scaleY(1); } 50% { opacity:1; transform:scaleY(.6); } }
+
+    /* ── META STRIP ── */
+    .cs-meta {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      padding: 0 clamp(2rem,7vw,8rem);
+      opacity: 0; transform: translateY(30px);
+    }
+    .meta-item {
+      padding: 36px 0; border-right: 1px solid var(--border);
+      padding-right: 32px; padding-left: 32px;
+    }
+    .meta-item:first-child { padding-left: 0; }
+    .meta-item:last-child  { border-right: none; }
+    .meta-label { font-family: var(--mono); font-size: .62rem; color: var(--muted); letter-spacing: .2em; text-transform: uppercase; margin-bottom: 10px; }
+    .meta-value { font-size: 1rem; font-weight: 600; letter-spacing: -.02em; }
+
+    /* ── SECTIONS ── */
+    .cs-section {
+      padding: clamp(5rem,10vw,10rem) clamp(2rem,7vw,8rem);
+      position: relative;
+    }
+    .section-label {
+      font-family: var(--mono); font-size: .68rem; color: var(--p);
+      letter-spacing: .22em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 12px; margin-bottom: 40px;
+    }
+    .section-label::before { content: ''; width: 28px; height: 1px; background: var(--p); }
+    .cs-section h2 {
+      font-size: clamp(2.2rem,5vw,4.5rem); font-weight: 700;
+      letter-spacing: -.04em; line-height: 1.05; margin-bottom: 32px;
+    }
+    .cs-section h2 em { color: var(--c); font-style: normal; }
+    .cs-body {
+      font-size: clamp(.95rem,1.4vw,1.1rem); color: var(--muted);
+      line-height: 1.85; max-width: 680px;
+    }
+    .cs-body + .cs-body { margin-top: 24px; }
+
+    /* ── TWO-COL ── */
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: clamp(3rem,6vw,8rem);
+      align-items: start;
+    }
+
+    /* ── FULL-BLEED IMAGE ── */
+    .cs-img-full {
+      width: 100%; aspect-ratio: 16/8;
+      border-radius: 24px; overflow: hidden;
+      border: 1px solid var(--border);
+      position: relative;
+      opacity: 0; transform: translateY(40px);
+    }
+    .cs-img-full img { width:100%; height:100%; object-fit:cover; display:block; }
+    .cs-img-full .img-placeholder {
+      width:100%; height:100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── IMAGE GRID ── */
+    .cs-img-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+      margin-top: 64px;
+      opacity: 0; transform: translateY(40px);
+    }
+    .cs-img-grid .cs-img-tile {
+      aspect-ratio: 4/3; border-radius: 20px; overflow: hidden;
+      border: 1px solid var(--border); position: relative;
+    }
+    .cs-img-grid .cs-img-tile img { width:100%; height:100%; object-fit:cover; display:block; }
+    .cs-img-grid .cs-img-tile.tall { grid-row: span 2; aspect-ratio: auto; min-height: 400px; }
+
+    /* ── FEATURE LIST ── */
+    .feature-list {
+      display: flex; flex-direction: column; gap: 0;
+      margin-top: 56px; border-top: 1px solid var(--border);
+    }
+    .feature-row {
+      display: grid; grid-template-columns: 56px 1fr 1fr;
+      gap: 0 clamp(2rem,4vw,5rem);
+      padding: 36px 0; border-bottom: 1px solid var(--border);
+      align-items: start;
+      opacity: 0; transform: translateX(-20px);
+      transition: background .25s;
+    }
+    .feature-row:hover { background: rgba(255,255,255,.015); }
+    .feature-num { font-family: var(--mono); font-size: .72rem; color: var(--muted); padding-top: 4px; }
+    .feature-title { font-size: clamp(1.2rem,2vw,1.65rem); font-weight: 700; letter-spacing: -.03em; }
+    .feature-desc  { font-size: .9rem; color: var(--muted); line-height: 1.8; }
+
+    /* ── METRICS ── */
+    .metrics-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 2px; margin-top: 64px;
+      border: 1px solid var(--border); border-radius: 20px; overflow: hidden;
+    }
+    .metric-card {
+      background: var(--surface); padding: 40px 36px;
+      border-right: 1px solid var(--border);
+      opacity: 0; transform: translateY(20px);
+    }
+    .metric-card:last-child { border-right: none; }
+    .metric-n {
+      font-size: clamp(3rem,6vw,5.5rem); font-weight: 700;
+      letter-spacing: -.04em; line-height: 1;
+      background: linear-gradient(135deg, var(--c), var(--p));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .metric-l { font-size: .85rem; color: var(--muted); margin-top: 12px; line-height: 1.5; }
+
+    /* ── PROCESS ── */
+    .process-items {
+      margin-top: 56px; display: flex; flex-direction: column; gap: 0;
+      border-top: 1px solid var(--border);
+    }
+    .process-item {
+      display: grid; grid-template-columns: 80px 1fr;
+      gap: 0 clamp(2rem,4vw,5rem);
+      padding: 40px 0; border-bottom: 1px solid var(--border);
+      opacity: 0; transform: translateY(20px);
+    }
+    .pi-idx { font-family: var(--mono); font-size: .72rem; color: var(--muted); padding-top: 6px; }
+    .pi-content h3 { font-size: clamp(1.4rem,2.5vw,2rem); font-weight: 700; letter-spacing: -.03em; margin-bottom: 16px; }
+    .pi-content p  { font-size: .9rem; color: var(--muted); line-height: 1.85; max-width: 640px; }
+
+    /* ── CASE STUDY DIVIDER ── */
+    .cs-divider {
+      margin: 0 clamp(2rem,7vw,8rem);
+      border: none;
+      border-top: 3px solid var(--border);
+      position: relative;
+    }
+    .cs-divider::before {
+      content: '';
+      position: absolute;
+      top: -2px; left: 0;
+      width: 120px; height: 3px;
+      background: linear-gradient(90deg, var(--pk), var(--c));
+    }
+
+    /* ── QUOTE ── */
+    .cs-quote {
+      padding: clamp(4rem,8vw,8rem) clamp(2rem,7vw,8rem);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      position: relative; overflow: hidden;
+      opacity: 0; transform: translateY(30px);
+    }
+    .cs-quote::before {
+      content: '"'; position: absolute; top: -40px; left: clamp(2rem,7vw,8rem);
+      font-size: clamp(14rem,22vw,22rem); line-height: 1;
+      font-family: var(--sans); font-weight: 700; color: rgba(139,92,246,.07);
+      pointer-events: none;
+    }
+    .cs-quote blockquote {
+      font-size: clamp(1.5rem,3.5vw,3rem); font-weight: 600;
+      letter-spacing: -.03em; line-height: 1.3; max-width: 900px;
+      position: relative; z-index: 1;
+    }
+    .cs-quote blockquote em { color: var(--c); font-style: normal; }
+
+    /* ── NEXT PROJECT ── */
+    .cs-next {
+      padding: clamp(5rem,10vw,10rem) clamp(2rem,7vw,8rem);
+      display: flex; flex-direction: column;
+      border-top: 1px solid var(--border);
+      position: relative; overflow: hidden;
+      opacity: 0; transform: translateY(30px);
+    }
+    .cs-next .next-label {
+      font-family: var(--mono); font-size: .68rem; color: var(--muted);
+      letter-spacing: .2em; text-transform: uppercase; margin-bottom: 32px;
+    }
+    .cs-next h2 {
+      font-size: clamp(2.5rem,7vw,7rem); font-weight: 700;
+      letter-spacing: -.04em; line-height: .95;
+      transition: color .3s;
+    }
+    .cs-next:hover h2 { color: var(--c); }
+    .cs-next a { text-decoration: none; color: inherit; display: flex; flex-direction: column; }
+    .next-arrow {
+      width: 64px; height: 64px; border-radius: 50%;
+      border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-top: 40px;
+      transition: background .3s, border-color .3s, transform .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    .cs-next:hover .next-arrow { background: var(--c); border-color: var(--c); color: var(--bg); transform: rotate(45deg) scale(1.1); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 28px clamp(2rem,5vw,5rem);
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--mono); font-size: .7rem; color: var(--muted);
+    }
+    footer a { color: var(--p); text-decoration: none; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      nav { left:0; right:0; transform:none; top:0; border-radius:0; border-left:none; border-right:none; border-top:none; width:100%; }
+      .cs-meta { grid-template-columns: 1fr 1fr; }
+      .meta-item:nth-child(2) { border-right: none; }
+      .two-col { grid-template-columns: 1fr; }
+      .cs-img-grid { grid-template-columns: 1fr; }
+      .cs-img-grid .cs-img-tile.tall { aspect-ratio: 4/3; grid-row: auto; min-height: auto; }
+      .feature-row { grid-template-columns: 44px 1fr; grid-template-rows: auto auto; gap: 6px 12px; }
+      .feature-num   { grid-row:1; grid-column:1; }
+      .feature-title { grid-row:1; grid-column:2; }
+      .feature-desc  { grid-row:2; grid-column:1/-1; padding-top:6px; }
+      .metrics-grid  { grid-template-columns: 1fr; }
+      .metric-card   { border-right: none; border-bottom: 1px solid var(--border); }
+      .metric-card:last-child { border-bottom: none; }
+      .process-item  { grid-template-columns: 44px 1fr; }
+      .cs-divider { margin: 0 clamp(1rem,4vw,2rem); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="index.html" class="nav-back"><span class="arrow">←</span> Back to Portfolio</a>
+  <span class="nav-logo">RA</span>
+  <a href="index.html#contact" class="nav-cta">Let's Talk</a>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="cs-hero">
+  <div class="hero-gradient"></div>
+  <div class="hero-grid-lines"></div>
+
+  <div class="hero-tag">Case Study · UX Design · Product Thinking</div>
+  <h1>Case <span class="accent">Studies</span></h1>
+
+  <div class="hero-meta-row">
+    <p class="hero-desc">A deep dive into real-world product challenges — focused on usability, clarity, and user trust. Two products, two problems, one goal: make the experience feel obvious.</p>
+    <div class="hero-chips">
+      <span class="hero-chip">UX Design</span>
+      <span class="hero-chip">Product Thinking</span>
+      <span class="hero-chip">Redesign</span>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>SCROLL</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ── META STRIP ── -->
+<div class="cs-meta">
+  <div class="meta-item">
+    <div class="meta-label">Role</div>
+    <div class="meta-value">Product Designer</div>
+  </div>
+  <div class="meta-item">
+    <div class="meta-label">Year</div>
+    <div class="meta-value">2026</div>
+  </div>
+  <div class="meta-item">
+    <div class="meta-label">Type</div>
+    <div class="meta-value">UX Case Studies</div>
+  </div>
+  <div class="meta-item">
+    <div class="meta-label">Tools</div>
+    <div class="meta-value">Figma · Miro · Notion</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- CASE STUDY 01 — SWIGGY                              -->
+<!-- ════════════════════════════════════════════════════ -->
+
+<!-- ── SWIGGY HERO IMAGE ── -->
+<div class="cs-section" style="padding-top:80px; padding-bottom:0">
+  <div class="cs-img-full">
+    <div class="img-placeholder" style="background: linear-gradient(135deg, #0e0e1c 0%, #1a0f18 40%, #0a1a10 100%);">
+      <svg width="100%" height="100%" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="swiggyCover" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0e0e1c"/>
+            <stop offset="50%" stop-color="#1a0e1a"/>
+            <stop offset="100%" stop-color="#071a10"/>
+          </linearGradient>
+          <linearGradient id="swiggyPink" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ff3370"/>
+            <stop offset="100%" stop-color="#00ffd1"/>
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="600" fill="url(#swiggyCover)"/>
+        <!-- Mobile frame left -->
+        <rect x="100" y="60" width="220" height="480" rx="28" fill="rgba(20,20,40,0.95)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+        <!-- Status bar -->
+        <rect x="120" y="80" width="180" height="8" rx="4" fill="rgba(255,255,255,0.06)"/>
+        <!-- Header -->
+        <rect x="120" y="108" width="180" height="36" rx="8" fill="rgba(255,51,112,0.1)" stroke="rgba(255,51,112,0.2)" stroke-width="1"/>
+        <rect x="132" y="120" width="100" height="12" rx="4" fill="rgba(255,51,112,0.7)"/>
+        <!-- Group session banner -->
+        <rect x="120" y="156" width="180" height="48" rx="10" fill="rgba(255,51,112,0.08)" stroke="rgba(255,51,112,0.15)" stroke-width="1"/>
+        <!-- Avatars row -->
+        <circle cx="138" cy="180" r="14" fill="rgba(255,51,112,0.3)" stroke="rgba(255,51,112,0.5)" stroke-width="1.5"/>
+        <circle cx="158" cy="180" r="14" fill="rgba(0,255,209,0.3)" stroke="rgba(0,255,209,0.5)" stroke-width="1.5"/>
+        <circle cx="178" cy="180" r="14" fill="rgba(139,92,246,0.3)" stroke="rgba(139,92,246,0.5)" stroke-width="1.5"/>
+        <circle cx="198" cy="180" r="14" fill="rgba(255,215,0,0.3)" stroke="rgba(255,215,0,0.5)" stroke-width="1.5"/>
+        <rect x="222" y="173" width="64" height="10" rx="4" fill="rgba(255,255,255,0.35)"/>
+        <!-- Cart items -->
+        <rect x="120" y="216" width="180" height="54" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <circle cx="140" cy="243" r="12" fill="rgba(255,51,112,0.15)"/>
+        <rect x="158" y="235" width="80" height="9" rx="4" fill="rgba(255,255,255,0.4)"/>
+        <rect x="158" y="250" width="56" height="7" rx="4" fill="rgba(110,109,138,0.4)"/>
+        <rect x="258" y="237" width="28" height="18" rx="100" fill="rgba(255,51,112,0.2)" stroke="rgba(255,51,112,0.4)" stroke-width="1"/>
+        <rect x="120" y="278" width="180" height="54" rx="8" fill="rgba(0,255,209,0.04)" stroke="rgba(0,255,209,0.08)" stroke-width="1"/>
+        <circle cx="140" cy="305" r="12" fill="rgba(0,255,209,0.15)"/>
+        <rect x="158" y="297" width="70" height="9" rx="4" fill="rgba(255,255,255,0.4)"/>
+        <rect x="158" y="312" width="52" height="7" rx="4" fill="rgba(110,109,138,0.4)"/>
+        <rect x="258" y="299" width="28" height="18" rx="100" fill="rgba(0,255,209,0.2)" stroke="rgba(0,255,209,0.4)" stroke-width="1"/>
+        <rect x="120" y="340" width="180" height="54" rx="8" fill="rgba(139,92,246,0.04)" stroke="rgba(139,92,246,0.08)" stroke-width="1"/>
+        <circle cx="140" cy="367" r="12" fill="rgba(139,92,246,0.15)"/>
+        <rect x="158" y="359" width="76" height="9" rx="4" fill="rgba(255,255,255,0.4)"/>
+        <rect x="158" y="374" width="48" height="7" rx="4" fill="rgba(110,109,138,0.4)"/>
+        <rect x="258" y="361" width="28" height="18" rx="100" fill="rgba(139,92,246,0.2)" stroke="rgba(139,92,246,0.4)" stroke-width="1"/>
+        <!-- CTA Button -->
+        <rect x="120" y="408" width="180" height="44" rx="10" fill="url(#swiggyPink)"/>
+        <rect x="160" y="424" width="100" height="12" rx="4" fill="rgba(0,0,0,0.4)"/>
+        <!-- Bottom nav -->
+        <rect x="120" y="464" width="180" height="56" rx="0" fill="rgba(14,14,28,0.98)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <circle cx="150" cy="492" r="10" fill="rgba(255,51,112,0.3)"/>
+        <circle cx="210" cy="492" r="10" fill="rgba(255,255,255,0.06)"/>
+        <circle cx="270" cy="492" r="10" fill="rgba(255,255,255,0.06)"/>
+
+        <!-- Mobile frame right — real-time cart -->
+        <rect x="880" y="60" width="220" height="480" rx="28" fill="rgba(20,20,40,0.95)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+        <rect x="900" y="80" width="180" height="8" rx="4" fill="rgba(255,255,255,0.06)"/>
+        <rect x="900" y="108" width="180" height="18" rx="5" fill="rgba(255,255,255,0.04)"/>
+        <rect x="900" y="134" width="120" height="14" rx="4" fill="rgba(255,255,255,0.3)"/>
+        <rect x="900" y="154" width="80" height="8" rx="4" fill="rgba(110,109,138,0.35)"/>
+        <!-- Live panel header -->
+        <rect x="900" y="174" width="180" height="28" rx="6" fill="rgba(0,255,209,0.08)" stroke="rgba(0,255,209,0.2)" stroke-width="1"/>
+        <circle cx="914" cy="188" r="5" fill="rgba(0,255,209,0.8)"/>
+        <rect x="924" y="183" width="90" height="9" rx="4" fill="rgba(0,255,209,0.5)"/>
+        <!-- Member items -->
+        <rect x="900" y="212" width="180" height="42" rx="8" fill="rgba(255,255,255,0.03)"/>
+        <circle cx="916" cy="233" r="10" fill="rgba(255,51,112,0.3)"/>
+        <rect x="932" y="226" width="60" height="8" rx="4" fill="rgba(255,255,255,0.5)"/>
+        <rect x="932" y="239" width="80" height="7" rx="4" fill="rgba(110,109,138,0.35)"/>
+        <rect x="900" y="262" width="180" height="42" rx="8" fill="rgba(0,255,209,0.03)"/>
+        <circle cx="916" cy="283" r="10" fill="rgba(0,255,209,0.3)"/>
+        <rect x="932" y="276" width="56" height="8" rx="4" fill="rgba(255,255,255,0.5)"/>
+        <rect x="932" y="289" width="72" height="7" rx="4" fill="rgba(110,109,138,0.35)"/>
+        <rect x="900" y="312" width="180" height="42" rx="8" fill="rgba(139,92,246,0.03)"/>
+        <circle cx="916" cy="333" r="10" fill="rgba(139,92,246,0.3)"/>
+        <rect x="932" y="326" width="64" height="8" rx="4" fill="rgba(255,255,255,0.5)"/>
+        <rect x="932" y="339" width="44" height="7" rx="4" fill="rgba(110,109,138,0.35)"/>
+        <!-- Ready signals -->
+        <rect x="900" y="366" width="180" height="52" rx="10" fill="rgba(0,255,209,0.06)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
+        <rect x="912" y="378" width="130" height="10" rx="4" fill="rgba(255,255,255,0.4)"/>
+        <rect x="912" y="396" width="80" height="8" rx="4" fill="rgba(0,255,209,0.5)"/>
+        <rect x="900" y="428" width="180" height="44" rx="10" fill="url(#swiggyPink)"/>
+        <rect x="940" y="444" width="100" height="12" rx="4" fill="rgba(0,0,0,0.4)"/>
+
+        <!-- Center label -->
+        <rect x="380" y="240" width="440" height="120" rx="16" fill="rgba(14,14,28,0.0)"/>
+        <rect x="400" y="258" width="200" height="14" rx="4" fill="rgba(255,51,112,0.4)"/>
+        <rect x="400" y="282" width="320" height="30" rx="6" fill="rgba(255,255,255,0.07)"/>
+        <rect x="400" y="322" width="260" height="12" rx="4" fill="rgba(110,109,138,0.3)"/>
+
+        <!-- Glow -->
+        <ellipse cx="210" cy="300" rx="120" ry="200" fill="rgba(255,51,112,0.04)"/>
+        <ellipse cx="990" cy="300" rx="120" ry="200" fill="rgba(0,255,209,0.04)"/>
+        <ellipse cx="600" cy="300" rx="180" ry="100" fill="rgba(139,92,246,0.04)"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ── SWIGGY OVERVIEW ── -->
+<section class="cs-section">
+  <div class="two-col">
+    <div>
+      <div class="section-label">01 / Swiggy</div>
+      <h2>Group Ordering — <em>Redesigned</em></h2>
+    </div>
+    <div style="padding-top: 80px;">
+      <p class="cs-body">Swiggy's group order feature lets multiple people add to a single cart — but the experience is fragmented, confusing, and prone to mid-flow drop-offs. The challenge: make group food ordering feel as effortless as ordering for one.</p>
+      <p class="cs-body">The redesign focused on three friction points — initiating a group session, tracking what others have added in real time, and managing the final order before checkout.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── SWIGGY PROBLEM AREAS ── -->
+<section class="cs-section" style="padding-top:0">
+  <div class="section-label">Problem Areas</div>
+  <h2>Where the <em>flow breaks</em></h2>
+
+  <div class="feature-list swiggy-features">
+    <div class="feature-row">
+      <span class="feature-num">[01]</span>
+      <h3 class="feature-title">Session Initiation</h3>
+      <p class="feature-desc">Creating a group order required too many steps and unclear affordances. Users often didn't know how to invite others or where to find the feature. Redesigned with a prominent entry point and a one-tap share flow.</p>
+    </div>
+    <div class="feature-row">
+      <span class="feature-num">[02]</span>
+      <h3 class="feature-title">Real-time Cart Visibility</h3>
+      <p class="feature-desc">Members had no live view of what others were adding. This caused duplicates, confusion at checkout, and order abandonment. Solution: a live "what everyone's adding" panel with name attribution.</p>
+    </div>
+    <div class="feature-row">
+      <span class="feature-num">[03]</span>
+      <h3 class="feature-title">Pre-checkout Coordination</h3>
+      <p class="feature-desc">The final review step before payment was a single user's responsibility with no visibility for the group. Redesigned with a shared review state and a "ready to order" signal from all members.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── SWIGGY PROCESS ── -->
+<section class="cs-section" style="padding-top:0">
+  <div class="section-label">Design Process</div>
+  <h2>How it <em>was approached</em></h2>
+  <div class="process-items swiggy-process">
+    <div class="process-item">
+      <span class="pi-idx">Pre-Game</span>
+      <div class="pi-content">
+        <h3>Heuristic Audit & Benchmarking</h3>
+        <p>Conducted a heuristic audit of the existing Swiggy group order flow. Identified 6 usability violations. Benchmarked against DoorDash and Uber Eats group features.</p>
+      </div>
+    </div>
+    <div class="process-item">
+      <span class="pi-idx">Game</span>
+      <div class="pi-content">
+        <h3>Exploring the Real-time Cart</h3>
+        <p>Explored 3 approaches for the real-time cart view — a floating panel, a split-screen layout, and a bottom drawer. The bottom drawer won in usability testing for thumb accessibility on mobile.</p>
+      </div>
+    </div>
+    <div class="process-item">
+      <span class="pi-idx">Post Game</span>
+      <div class="pi-content">
+        <h3>Annotated Flows & Edge Cases</h3>
+        <p>Delivered annotated flows, component specs, and a full prototype in Figma. Documented edge cases: what happens when a member leaves mid-order, payment split scenarios, and timeout states.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── DIVIDER ── -->
+<hr class="cs-divider" />
+
+<!-- ════════════════════════════════════════════════════ -->
+<!-- CASE STUDY 02 — GOOGLE PAY                          -->
+<!-- ════════════════════════════════════════════════════ -->
+
+<!-- ── GPAY HERO IMAGE ── -->
+<div class="cs-section" style="padding-top:80px; padding-bottom:0">
+  <div class="cs-img-full">
+    <div class="img-placeholder" style="background: linear-gradient(135deg, #070f14 0%, #0a1220 40%, #071a14 100%);">
+      <svg width="100%" height="100%" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="gpayCover" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#070f14"/>
+            <stop offset="50%" stop-color="#0a1220"/>
+            <stop offset="100%" stop-color="#071a14"/>
+          </linearGradient>
+          <linearGradient id="gpayGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ff3370"/>
+            <stop offset="100%" stop-color="#00ffd1"/>
+          </linearGradient>
+          <linearGradient id="gpayRing" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="rgba(0,255,209,0.6)"/>
+            <stop offset="100%" stop-color="rgba(255,51,112,0.6)"/>
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="600" fill="url(#gpayCover)"/>
+
+        <!-- Mobile frame — Processing screen -->
+        <rect x="440" y="40" width="320" height="520" rx="36" fill="rgba(10,18,32,0.97)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
+        <!-- Status bar -->
+        <rect x="460" y="62" width="280" height="8" rx="4" fill="rgba(255,255,255,0.04)"/>
+        <!-- Header text -->
+        <rect x="490" y="96" width="220" height="18" rx="5" fill="rgba(255,255,255,0.1)"/>
+        <rect x="520" y="122" width="160" height="10" rx="4" fill="rgba(110,109,138,0.4)"/>
+
+        <!-- Pulsing ring animation (static representation) -->
+        <circle cx="600" cy="240" r="72" fill="none" stroke="url(#gpayRing)" stroke-width="3" opacity="0.9"/>
+        <circle cx="600" cy="240" r="56" fill="none" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
+        <circle cx="600" cy="240" r="40" fill="rgba(0,255,209,0.06)" stroke="rgba(0,255,209,0.2)" stroke-width="1"/>
+        <!-- G Pay icon placeholder -->
+        <rect x="576" y="224" width="48" height="32" rx="8" fill="rgba(255,255,255,0.08)"/>
+        <rect x="584" y="232" width="24" height="16" rx="4" fill="rgba(0,255,209,0.3)"/>
+
+        <!-- Step checklist -->
+        <rect x="470" y="332" width="260" height="38" rx="9" fill="rgba(0,255,209,0.08)" stroke="rgba(0,255,209,0.2)" stroke-width="1"/>
+        <circle cx="492" cy="351" r="9" fill="rgba(0,255,209,0.8)"/>
+        <rect x="488" y="347" width="8" height="8" rx="2" fill="rgba(0,0,0,0.6)"/>
+        <rect x="510" y="346" width="120" height="9" rx="4" fill="rgba(255,255,255,0.5)"/>
+        <rect x="510" y="359" width="80" height="7" rx="4" fill="rgba(0,255,209,0.4)"/>
+
+        <rect x="470" y="378" width="260" height="38" rx="9" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <circle cx="492" cy="397" r="9" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+        <rect x="510" y="392" width="100" height="9" rx="4" fill="rgba(255,255,255,0.3)"/>
+        <rect x="510" y="405" width="64" height="7" rx="4" fill="rgba(110,109,138,0.3)"/>
+
+        <rect x="470" y="424" width="260" height="38" rx="9" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <circle cx="492" cy="443" r="9" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+        <rect x="510" y="438" width="80" height="9" rx="4" fill="rgba(255,255,255,0.3)"/>
+        <rect x="510" y="451" width="112" height="7" rx="4" fill="rgba(110,109,138,0.3)"/>
+
+        <!-- Bank trust strip -->
+        <rect x="470" y="480" width="260" height="48" rx="10" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <rect x="486" y="494" width="80" height="8" rx="4" fill="rgba(110,109,138,0.35)"/>
+        <rect x="486" y="508" width="120" height="9" rx="4" fill="rgba(255,255,255,0.25)"/>
+        <rect x="686" y="490" width="28" height="28" rx="6" fill="rgba(0,255,209,0.1)" stroke="rgba(0,255,209,0.2)" stroke-width="1"/>
+
+        <!-- Background glow -->
+        <ellipse cx="600" cy="240" rx="160" ry="160" fill="rgba(0,255,209,0.03)"/>
+        <ellipse cx="300" cy="300" rx="200" ry="150" fill="rgba(255,51,112,0.03)"/>
+        <ellipse cx="900" cy="300" rx="200" ry="150" fill="rgba(0,255,209,0.03)"/>
+
+        <!-- Side annotations (left) -->
+        <rect x="100" y="200" width="260" height="80" rx="12" fill="rgba(14,14,28,0.7)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <rect x="120" y="218" width="80" height="10" rx="4" fill="rgba(255,51,112,0.5)"/>
+        <rect x="120" y="236" width="210" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
+        <rect x="120" y="252" width="180" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
+        <!-- Connector line -->
+        <line x1="360" y1="240" x2="440" y2="240" stroke="rgba(255,51,112,0.2)" stroke-width="1" stroke-dasharray="4 4"/>
+
+        <!-- Side annotations (right) -->
+        <rect x="840" y="320" width="260" height="80" rx="12" fill="rgba(14,14,28,0.7)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <rect x="860" y="338" width="80" height="10" rx="4" fill="rgba(0,255,209,0.5)"/>
+        <rect x="860" y="356" width="210" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
+        <rect x="860" y="372" width="150" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
+        <!-- Connector line -->
+        <line x1="760" y1="360" x2="840" y2="360" stroke="rgba(0,255,209,0.2)" stroke-width="1" stroke-dasharray="4 4"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ── GPAY OVERVIEW ── -->
+<section class="cs-section">
+  <div class="two-col">
+    <div>
+      <div class="section-label">02 / Google Pay</div>
+      <h2>The 'Processing' state that <em>loses trust</em></h2>
+    </div>
+    <div style="padding-top: 80px;">
+      <p class="cs-body">When a Google Pay transaction is processing, users see a generic spinner with no feedback. For 3–8 seconds, they have no idea if the payment went through, if it's stuck, or if something went wrong. That uncertainty is a UX failure.</p>
+      <p class="cs-body">The redesign focused on making the processing state feel alive — communicating progress, reducing anxiety, and giving users confidence that something real is happening.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── GPAY PROBLEM AREAS ── -->
+<section class="cs-section" style="padding-top:0">
+  <div class="section-label">Problem Areas</div>
+  <h2>3–8 seconds of <em>uncertainty</em></h2>
+
+  <div class="feature-list gpay-features">
+    <div class="feature-row">
+      <span class="feature-num">[01]</span>
+      <h3 class="feature-title">Zero Progress Feedback</h3>
+      <p class="feature-desc">The existing spinner gives no sense of stages. Is it connecting? Verifying? Waiting for the bank? A redesigned state machine communicates each micro-step with clear, calming language.</p>
+    </div>
+    <div class="feature-row">
+      <span class="feature-num">[02]</span>
+      <h3 class="feature-title">Ambiguous Failure States</h3>
+      <p class="feature-desc">When a payment fails, the error screen arrives abruptly with no transition. Users aren't sure if they were charged. Redesigned with a graceful failure state that answers the most important question first: "You were not charged."</p>
+    </div>
+    <div class="feature-row">
+      <span class="feature-num">[03]</span>
+      <h3 class="feature-title">Trust Signals During Wait</h3>
+      <p class="feature-desc">High-value payments create disproportionate anxiety during the wait. Added contextual reassurance — bank name, masked account, and a real-time status indicator — so users feel informed, not abandoned.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── GPAY PROCESS ── -->
+<section class="cs-section" style="padding-top:0">
+  <div class="section-label">Design Process</div>
+  <h2>Designing <em>calm under pressure</em></h2>
+  <div class="process-items gpay-process">
+    <div class="process-item">
+      <span class="pi-idx">Pre-Game</span>
+      <div class="pi-content">
+        <h3>Mapping the Anxiety Window</h3>
+        <p>Mapped the full payment journey from tap-to-confirm. Identified that 100% of anxiety occurs in the 3–8 second processing window. Referenced research on perceived wait time and animation's effect on anxiety reduction.</p>
+      </div>
+    </div>
+    <div class="process-item">
+      <span class="pi-idx">Game</span>
+      <div class="pi-content">
+        <h3>Testing 4 Processing Animations</h3>
+        <p>Designed 4 versions of the processing animation — a progress bar, a pulsing ring, a step-by-step checklist, and a morphing icon. User testing showed the step-by-step checklist (even with fabricated steps) reduced anxiety by making the wait feel purposeful.</p>
+      </div>
+    </div>
+    <div class="process-item">
+      <span class="pi-idx">Post Game</span>
+      <div class="pi-content">
+        <h3>Motion Specs & State Machine</h3>
+        <p>Delivered motion specs for the processing state transitions. Documented the full state machine: pending → processing → success / failure, with timing and easing for each transition.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PULL QUOTE ── -->
+<div class="cs-quote">
+  <blockquote>"The best UX is the kind users <em>never notice</em> — but always trust."</blockquote>
+</div>
+
+<!-- ── METRICS ── -->
+<section class="cs-section">
+  <div class="section-label">Outcomes</div>
+  <h2>Across both <em>studies</em></h2>
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-n">6</div>
+      <div class="metric-l">Usability violations identified across both heuristic audits</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-n">3</div>
+      <div class="metric-l">Redesigned critical flows — initiation, real-time cart, and processing state</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-n">4</div>
+      <div class="metric-l">Processing state variants tested before arriving at the final design</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── NEXT PROJECT ── -->
+<div class="cs-next">
+  <span class="next-label">Next Project</span>
+  <a href="index.html#work">
+    <h2>Back to All Projects →</h2>
+    <div class="next-arrow">↗</div>
+  </a>
+</div>
+
+<footer>
+  <span>© 2026 Ronold Anthony</span>
+  <a href="index.html">← Back to Portfolio</a>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ── Cursor ──────────────────────────────────────────────────
+const dot  = document.getElementById('cur-dot');
+const ring = document.getElementById('cur-ring');
+let mx=0, my=0, rx=0, ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; gsap.set(dot,{x:mx,y:my}); });
+(function tick() { rx+=(mx-rx)*.13; ry+=(my-ry)*.13; gsap.set(ring,{x:rx,y:ry}); requestAnimationFrame(tick); })();
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', ()=>{ dot.classList.add('hov'); ring.classList.add('hov'); });
+  el.addEventListener('mouseleave', ()=>{ dot.classList.remove('hov'); ring.classList.remove('hov'); });
+});
+
+// ── Hero entrance ────────────────────────────────────────────
+gsap.to('.hero-tag',       { opacity:1, y:0, duration:.8, ease:'power3.out', delay:.2 });
+gsap.to('.cs-hero h1',     { opacity:1, y:0, duration:1, ease:'power4.out', delay:.4 });
+gsap.to('.hero-meta-row',  { opacity:1, y:0, duration:.8, ease:'power3.out', delay:.7 });
+gsap.to('.scroll-hint',    { opacity:1, duration:.8, delay:1.2 });
+
+// ── Meta strip ───────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.cs-meta', start: 'top 85%',
+  onEnter: () => gsap.to('.cs-meta', { opacity:1, y:0, duration:.8, ease:'power3.out' })
+});
+
+// ── Full-bleed images ────────────────────────────────────────
+gsap.utils.toArray('.cs-img-full').forEach(el => {
+  ScrollTrigger.create({
+    trigger: el, start: 'top 85%',
+    onEnter: () => gsap.to(el, { opacity:1, y:0, duration:1, ease:'power3.out' })
+  });
+});
+
+// ── Image grids ──────────────────────────────────────────────
+gsap.utils.toArray('.cs-img-grid').forEach(el => {
+  ScrollTrigger.create({
+    trigger: el, start: 'top 85%',
+    onEnter: () => gsap.to(el, { opacity:1, y:0, duration:1, ease:'power3.out' })
+  });
+});
+
+// ── Feature rows — Swiggy ────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.swiggy-features', start: 'top 85%',
+  onEnter: () => gsap.to('.swiggy-features .feature-row', { opacity:1, x:0, duration:.7, ease:'power3.out', stagger:.12 })
+});
+
+// ── Feature rows — GPay ──────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.gpay-features', start: 'top 85%',
+  onEnter: () => gsap.to('.gpay-features .feature-row', { opacity:1, x:0, duration:.7, ease:'power3.out', stagger:.12 })
+});
+
+// ── Metrics ──────────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.metrics-grid', start: 'top 85%',
+  onEnter: () => gsap.to('.metric-card', { opacity:1, y:0, duration:.7, ease:'power3.out', stagger:.1 })
+});
+
+// ── Process items — Swiggy ───────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.swiggy-process', start: 'top 85%',
+  onEnter: () => gsap.to('.swiggy-process .process-item', { opacity:1, y:0, duration:.7, ease:'power3.out', stagger:.15 })
+});
+
+// ── Process items — GPay ─────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.gpay-process', start: 'top 85%',
+  onEnter: () => gsap.to('.gpay-process .process-item', { opacity:1, y:0, duration:.7, ease:'power3.out', stagger:.15 })
+});
+
+// ── Quote ────────────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.cs-quote', start: 'top 85%',
+  onEnter: () => gsap.to('.cs-quote', { opacity:1, y:0, duration:.9, ease:'power3.out' })
+});
+
+// ── Next section ─────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.cs-next', start: 'top 85%',
+  onEnter: () => gsap.to('.cs-next', { opacity:1, y:0, duration:.8, ease:'power3.out' })
+});
+
+// ── Generic section reveals ──────────────────────────────────
+document.querySelectorAll('.cs-section').forEach(sec => {
+  ScrollTrigger.create({
+    trigger: sec, start: 'top 88%',
+    onEnter: () => {
+      gsap.from(sec.querySelectorAll('.section-label, h2, .cs-body, .two-col > div'), {
+        opacity:0, y:28, duration:.7, ease:'power3.out', stagger:.1
+      });
+    }
+  });
+});
+</script>
+
+</body>
+</html>

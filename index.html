@@ -507,6 +507,7 @@
     .c2 .proj-card-bg { background: linear-gradient(135deg,rgba(255,51,112,.18),rgba(139,92,246,.1)); }
     .c3 .proj-card-bg { background: linear-gradient(135deg,rgba(0,255,209,.18),rgba(255,215,0,.1)); }
     .c4 .proj-card-bg { background: linear-gradient(135deg,rgba(255,215,0,.18),rgba(255,51,112,.1)); }
+    .c5 .proj-card-bg { background: linear-gradient(135deg,rgba(0,255,209,.18),rgba(255,51,112,.1)); }
 
     .proj-inner {
       padding: 32px; height: 100%; min-height: 280px;
@@ -591,7 +592,10 @@
     .ct-head .line   { display: block; overflow: hidden; }
     .ct-head .line s { display: block; transform: translateY(112%); text-decoration: none; }
     .ct-accent {
-      background: linear-gradient(135deg, var(--p), var(--pk));
+      color: var(--muted);
+    }
+    .ct-accent-loud {
+      background: linear-gradient(120deg, var(--c), var(--pk), var(--p));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
     .ct-email {
@@ -778,6 +782,42 @@
     .process-step:hover .step-tag {
       border-color: rgba(139,92,246,.4); color: var(--text);
     }
+
+    /* ═══════════════════════════════════════════
+       PROCESS HOVER IMAGE
+    ═══════════════════════════════════════════ */
+    .process-hover-img {
+      position: fixed;
+      right: clamp(3rem, 6vw, 7rem);
+      top: 50%;
+      transform: translateY(-50%) scale(0.88);
+      width: clamp(280px, 28vw, 440px);
+      aspect-ratio: 4/3;
+      border-radius: 24px;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 500;
+      transition: opacity .38s ease, transform .5s cubic-bezier(.34,1.56,.64,1), top .5s cubic-bezier(.34,1.56,.64,1);
+      box-shadow: 0 36px 90px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.06);
+    }
+    .process-hover-img.visible {
+      opacity: 1;
+      transform: translateY(-50%) scale(1);
+    }
+    .process-hover-img img {
+      width: 100%; height: 100%; object-fit: cover;
+      display: block;
+      transition: transform .6s ease;
+    }
+    .process-hover-img:hover img { transform: scale(1.04); }
+    .process-hover-img::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, rgba(139,92,246,.18) 0%, rgba(0,255,209,.06) 100%);
+      pointer-events: none;
+    }
+    @media (max-width: 1024px) { .process-hover-img { display: none; } }
 
     /* ═══════════════════════════════════════════
        FOOTER
@@ -994,7 +1034,7 @@
   </div>
 
   <div class="proj-grid">
-    <div class="proj-card c1" data-tilt>
+    <a href="subnest.html" class="proj-card c1" data-tilt style="text-decoration:none;color:inherit;display:block;">
       <div class="proj-card-bg"></div>
       <div class="proj-inner">
         <div>
@@ -1007,55 +1047,70 @@
           <h3 class="proj-name">SubNest</h3>
           <p style="font-size:.75rem;color:var(--muted);margin-top:6px;font-family:var(--mono)">A subscriptions tracking web app</p>
           <p class="proj-desc" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">A full-stack subscription manager built to eliminate billing blind spots — track renewals, monitor spending across categories, and get notified before auto-charges hit.</p>
-          <a href="#" class="proj-link">View Project <span>→</span></a>
+          <span class="proj-link">View Project <span>→</span></span>
         </div>
       </div>
-    </div>
+    </a>
 
-    <div class="proj-card c2" data-tilt>
+    <a href="freelance-tracker.html" class="proj-card c2" data-tilt style="text-decoration:none;color:inherit;display:block;">
       <div class="proj-card-bg"></div>
       <div class="proj-inner">
         <div>
           <div class="proj-num">02 / 2026</div>
-          <div class="proj-tags"><span class="ptag">Next.js</span><span class="ptag">TypeScript</span></div>
+          <div class="proj-tags"><span class="ptag">React</span><span class="ptag">Supabase</span><span class="ptag">Vite</span></div>
         </div>
         <div>
-          <h3 class="proj-name">Design System</h3>
-          <p class="proj-desc">A comprehensive design system with 100+ components, dark/light modes, and full accessibility support.</p>
-          <a href="#" class="proj-link">View Project <span>→</span></a>
+          <h3 class="proj-name">Freelance Work<br>Tracker</h3>
+          <p class="proj-desc" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">A full-stack web app for managing freelancer work logs and monthly payments, with role-based access, real-time sync, and an approval workflow for daily entries.</p>
+          <span class="proj-link">View Project <span>→</span></span>
         </div>
       </div>
-    </div>
+    </a>
 
-    <div class="proj-card c3" data-tilt>
+    <a href="ux-research-tool.html" class="proj-card c3" data-tilt style="text-decoration:none;color:inherit;display:block;">
       <div class="proj-card-bg"></div>
       <div class="proj-inner">
         <div>
           <div class="proj-num">03 / 2026</div>
-          <div class="proj-tags"><span class="ptag">Node.js</span><span class="ptag">WebSockets</span></div>
+          <div class="proj-tags"><span class="ptag">React</span><span class="ptag">Supabase</span><span class="ptag">Recharts</span></div>
         </div>
         <div>
-          <h3 class="proj-name">Realtime<br>Dashboard</h3>
-          <p class="proj-desc">Live analytics platform with WebSocket streaming, animated data visualizations, and sub-100ms updates.</p>
-          <a href="#" class="proj-link">View Project <span>→</span></a>
+          <h3 class="proj-name">UX Research<br>Tool</h3>
+          <p class="proj-desc" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">A full-stack user testing analytics app with a 7-step interview wizard, SUS scoring, NPS tracking, and real-time session dashboards — built for distributed design teams.</p>
+          <span class="proj-link">View Project <span>→</span></span>
         </div>
       </div>
-    </div>
+    </a>
 
-    <div class="proj-card c4" data-tilt>
+    <a href="promptra.html" class="proj-card c4" data-tilt style="text-decoration:none;color:inherit;display:block;">
       <div class="proj-card-bg"></div>
       <div class="proj-inner">
         <div>
           <div class="proj-num">04 / 2026</div>
-          <div class="proj-tags"><span class="ptag">AI</span><span class="ptag">Python</span></div>
+          <div class="proj-tags"><span class="ptag">Social</span><span class="ptag">AI</span><span class="ptag">Prompts</span></div>
         </div>
         <div>
-          <h3 class="proj-name">AI Creative<br>Tool</h3>
-          <p class="proj-desc">Generative AI tool for designers with real-time style transfer, prompt-to-UI generation, and custom fine-tuning.</p>
-          <a href="#" class="proj-link">View Project <span>→</span></a>
+          <h3 class="proj-name">Promptra</h3>
+          <p class="proj-desc" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">A social platform for prompts with Creator Studio and Versioning — remix prompts, track how they evolve through community-driven versions, and build on each other's work.</p>
+          <span class="proj-link">View Project <span>→</span></span>
         </div>
       </div>
-    </div>
+    </a>
+
+    <a href="case-studies.html" class="proj-card c5" data-tilt style="text-decoration:none;color:inherit;display:block;">
+      <div class="proj-card-bg"></div>
+      <div class="proj-inner">
+        <div>
+          <div class="proj-num">05 / 2026</div>
+          <div class="proj-tags"><span class="ptag">UX</span><span class="ptag">Case Study</span><span class="ptag">Product</span></div>
+        </div>
+        <div>
+          <h3 class="proj-name">Case Studies —<br>Swiggy &amp; GPay</h3>
+          <p class="proj-desc" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">A deep dive into real-world product challenges — Swiggy's group ordering experience and Google Pay's payment processing flow, focused on usability, clarity, and user trust.</p>
+          <span class="proj-link">View Project <span>→</span></span>
+        </div>
+      </div>
+    </a>
   </div>
 </section>
 
@@ -1069,22 +1124,16 @@
     <span class="w"><s>Technologies</s></span>
   </h2>
   <div class="skills-cloud">
-    <div class="skill"><span>React / Next.js</span></div>
-    <div class="skill"><span>TypeScript</span></div>
-    <div class="skill"><span>Three.js / WebGL</span></div>
-    <div class="skill"><span>GSAP</span></div>
-    <div class="skill"><span>Framer Motion</span></div>
-    <div class="skill"><span>Node.js</span></div>
-    <div class="skill"><span>Python</span></div>
-    <div class="skill"><span>PostgreSQL</span></div>
     <div class="skill"><span>Figma</span></div>
-    <div class="skill"><span>CSS / Tailwind</span></div>
-    <div class="skill"><span>WebSockets</span></div>
-    <div class="skill"><span>GraphQL</span></div>
-    <div class="skill"><span>Docker</span></div>
-    <div class="skill"><span>AWS</span></div>
-    <div class="skill"><span>Blender</span></div>
-    <div class="skill"><span>GLSL Shaders</span></div>
+    <div class="skill"><span>Product Management</span></div>
+    <div class="skill"><span>Notion</span></div>
+    <div class="skill"><span>Adobe Creative Suite</span></div>
+    <div class="skill"><span>Miro</span></div>
+    <div class="skill"><span>Communication &amp; Collaboration</span></div>
+    <div class="skill"><span>Quality Analysis</span></div>
+    <div class="skill"><span>Interaction Design</span></div>
+    <div class="skill"><span>User Research</span></div>
+    <div class="skill"><span>Vibe Coding</span></div>
   </div>
 </section>
 
@@ -1100,89 +1149,36 @@
 
   <div class="process-steps">
 
-    <div class="process-step">
+    <div class="process-step" data-img="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=900&q=90" data-pos="28">
       <div class="step-num-wrap"><div class="step-dot"></div></div>
       <div class="step-body">
         <div class="step-header">
           <span class="step-index">01</span>
-          <h3 class="step-title">Dis<span class="accent">cover</span></h3>
+          <h3 class="step-title">Pre-<span class="accent">Game</span></h3>
         </div>
-        <p class="step-desc">Every great product starts with deep curiosity. I immerse myself in the problem space — conducting stakeholder interviews, user research, competitive audits, and heuristic analyses to build a clear picture of what actually needs solving.</p>
-        <div class="step-tags">
-          <span class="step-tag">User Research</span>
-          <span class="step-tag">Stakeholder Interviews</span>
-          <span class="step-tag">Competitive Analysis</span>
-          <span class="step-tag">Heuristic Audit</span>
-        </div>
+        <p class="step-desc">Every product begins with alignment. I work with Product Managers and stakeholders to break down briefs, map user journeys, and define flows. Through rapid prototyping and focused research—leveraging AI tools and competitive insights—I set a clear direction before design begins.</p>
       </div>
     </div>
 
-    <div class="process-step">
+    <div class="process-step" data-img="https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=900&q=90" data-pos="50">
       <div class="step-num-wrap"><div class="step-dot"></div></div>
       <div class="step-body">
         <div class="step-header">
           <span class="step-index">02</span>
-          <h3 class="step-title">De<span class="accent">fine</span></h3>
+          <h3 class="step-title"><span class="accent">Game</span></h3>
         </div>
-        <p class="step-desc">Insights become strategy. I synthesise research into a sharp problem statement, map out information architecture, define success metrics, and align all stakeholders around a shared direction before a single pixel is drawn.</p>
-        <div class="step-tags">
-          <span class="step-tag">Problem Framing</span>
-          <span class="step-tag">Information Architecture</span>
-          <span class="step-tag">User Flows</span>
-          <span class="step-tag">KPI Definition</span>
-        </div>
+        <p class="step-desc">This is where strategy turns into screens. I translate insights from the Pre-Game into high-fidelity designs, focusing on clarity, usability, and detail. Through continuous feedback and iteration, I refine the experience until it's ready to perform.</p>
       </div>
     </div>
 
-    <div class="process-step">
+    <div class="process-step" data-img="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=900&q=90" data-pos="72">
       <div class="step-num-wrap"><div class="step-dot"></div></div>
       <div class="step-body">
         <div class="step-header">
           <span class="step-index">03</span>
-          <h3 class="step-title">De<span class="accent">sign</span></h3>
+          <h3 class="step-title">Post <span class="accent">Game</span></h3>
         </div>
-        <p class="step-desc">From rough sketches to high-fidelity prototypes. I explore broadly, iterate fast, and validate early — obsessing over typography, spacing, motion, and the micro-interactions that make interfaces feel alive and intuitive.</p>
-        <div class="step-tags">
-          <span class="step-tag">Wireframing</span>
-          <span class="step-tag">Prototyping</span>
-          <span class="step-tag">Motion Design</span>
-          <span class="step-tag">Design Systems</span>
-          <span class="step-tag">Usability Testing</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="process-step">
-      <div class="step-num-wrap"><div class="step-dot"></div></div>
-      <div class="step-body">
-        <div class="step-header">
-          <span class="step-index">04</span>
-          <h3 class="step-title">De<span class="accent">velop</span></h3>
-        </div>
-        <p class="step-desc">Design only matters if it ships. I write clean, performant production code — bridging the gap between design intent and engineering reality. Every animation, interaction, and edge case is accounted for before launch.</p>
-        <div class="step-tags">
-          <span class="step-tag">React / Next.js</span>
-          <span class="step-tag">GSAP / Three.js</span>
-          <span class="step-tag">Performance Optimisation</span>
-          <span class="step-tag">Accessibility</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="process-step">
-      <div class="step-num-wrap"><div class="step-dot"></div></div>
-      <div class="step-body">
-        <div class="step-header">
-          <span class="step-index">05</span>
-          <h3 class="step-title">De<span class="accent">liver</span></h3>
-        </div>
-        <p class="step-desc">Launch is just the beginning. I monitor real-user behaviour, run A/B tests, and iterate continuously — turning data into improvements that compound over time and keep the product ahead of the curve.</p>
-        <div class="step-tags">
-          <span class="step-tag">A/B Testing</span>
-          <span class="step-tag">Analytics</span>
-          <span class="step-tag">Iteration</span>
-          <span class="step-tag">Handoff &amp; Docs</span>
-        </div>
+        <p class="step-desc">Where design meets reality. I ensure a smooth handoff by delivering clear specs, assets, and documentation to developers. Post-handoff, I stay involved through Design QA—reviewing builds, catching inconsistencies, and making sure the final product matches the intent.</p>
       </div>
     </div>
 
@@ -1198,25 +1194,31 @@
     <h2 class="ct-head">
       <span class="line"><s>Let's Build</s></span>
       <span class="line"><s class="ct-accent">Something</s></span>
-      <span class="line"><s>Insane.</s></span>
+      <span class="line"><s class="ct-accent-loud">Insane.</s></span>
     </h2>
-    <a href="mailto:hello@yourname.com" class="ct-email">
+    <a href="mailto:ronoldanthony@gmail.com" class="ct-email">
       <div class="arr">↗</div>
-      hello@yourname.com
+      ronoldanthony@gmail.com
     </a>
     <div class="ct-socials">
-      <a href="#" class="s-link">GitHub</a>
-      <a href="#" class="s-link">LinkedIn</a>
-      <a href="#" class="s-link">Twitter / X</a>
-      <a href="#" class="s-link">Dribbble</a>
+      <a href="https://www.instagram.com/_ron_ronnie_?igsh=MTRwbHBpbjFib2I2bg%3D%3D&utm_source=qr" target="_blank" rel="noopener" class="s-link">Instagram</a>
+      <a href="https://medium.com/@ronoldanthony" target="_blank" rel="noopener" class="s-link">Medium</a>
+      <a href="https://github.com/ronronnie" target="_blank" rel="noopener" class="s-link">GitHub</a>
+      <a href="https://www.linkedin.com/in/ronold-anthony-753b8b192/" target="_blank" rel="noopener" class="s-link">LinkedIn</a>
+      <a href="https://www.behance.net/ronoldanthony" target="_blank" rel="noopener" class="s-link">Behance</a>
     </div>
   </div>
 </section>
 
 <footer>
   <span>© 2026 Ronold Anthony. All rights reserved.</span>
-  <span>Built with love &amp; code ✦</span>
+  <span>Built with love for design and making Starbucks rich ✦</span>
 </footer>
+
+<!-- Process hover image (desktop only) -->
+<div class="process-hover-img" id="process-hover-img">
+  <img src="" alt="" id="process-hover-img-el">
+</div>
 
 <!-- ══════════════════════════════════
      SCRIPTS
@@ -1533,6 +1535,40 @@ document.querySelectorAll('nav a').forEach(a => {
   const orig = a.textContent;
   a.addEventListener('mouseenter', () => scramble(a, orig));
 });
+
+// ─── PROCESS STEP HOVER IMAGE (desktop only) ─────────────────
+(function () {
+  const panel = document.getElementById('process-hover-img');
+  const img   = document.getElementById('process-hover-img-el');
+  if (!panel || !img) return;
+
+  if (window.matchMedia('(max-width: 1024px)').matches) return;
+
+  let hideTimer;
+
+  document.querySelectorAll('.process-step[data-img]').forEach(step => {
+    step.addEventListener('mouseenter', () => {
+      clearTimeout(hideTimer);
+      const src = step.dataset.img;
+      const pos = step.dataset.pos || '50';
+
+      // Update image source
+      if (img.getAttribute('src') !== src) {
+        img.style.opacity = '0';
+        img.src = src;
+        img.onload = () => gsap.to(img, { opacity: 1, duration: 0.3 });
+      }
+
+      // Animate panel position
+      gsap.to(panel, { top: pos + '%', duration: 0.55, ease: 'power3.out' });
+      panel.classList.add('visible');
+    });
+
+    step.addEventListener('mouseleave', () => {
+      hideTimer = setTimeout(() => panel.classList.remove('visible'), 100);
+    });
+  });
+})();
 
 // ─── STORY LIST ROW HOVER ANIMATION ──────────────────────────
 document.querySelectorAll('.sl-row').forEach(row => {

@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UX Research Tool — Case Study · Ronold Anthony</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:       #07070f;
+      --surface:  #0e0e1c;
+      --surface2: #141428;
+      --p:        #8b5cf6;
+      --c:        #00ffd1;
+      --pk:       #ff3370;
+      --y:        #ffd700;
+      --text:     #f0eef8;
+      --muted:    #6e6d8a;
+      --border:   rgba(255,255,255,0.065);
+      --sans:     'Space Grotesk', sans-serif;
+      --mono:     'Space Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); overflow-x: hidden; cursor: none; }
+
+    /* grain */
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.035; pointer-events: none; z-index: 9999;
+    }
+
+    /* cursor */
+    #cur-dot  { width:8px; height:8px; background:var(--c); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:10001; transform:translate(-50%,-50%); mix-blend-mode:exclusion; }
+    #cur-ring { width:42px; height:42px; border:1.5px solid rgba(0,255,209,.35); border-radius:50%; position:fixed; top:0; left:0; pointer-events:none; z-index:10000; transform:translate(-50%,-50%); transition:width .35s cubic-bezier(.165,.84,.44,1), height .35s cubic-bezier(.165,.84,.44,1), border-color .3s; }
+    #cur-dot.hov  { width:14px; height:14px; background:var(--pk); }
+    #cur-ring.hov { width:64px; height:64px; border-color:rgba(255,51,112,.5); }
+    @media (max-width:768px) { body { cursor:auto; } #cur-dot,#cur-ring { display:none; } }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 32px; z-index: 1000;
+      background: rgba(14,14,28,.72); backdrop-filter: blur(18px);
+      border: 1px solid var(--border); border-radius: 100px;
+      padding: 10px 20px 10px 16px;
+      width: min(92vw, 720px);
+    }
+    .nav-back {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--mono); font-size: .72rem; color: var(--muted);
+      text-decoration: none; letter-spacing: .06em;
+      transition: color .3s;
+    }
+    .nav-back:hover { color: var(--c); }
+    .nav-back .arrow { font-size: 1rem; transition: transform .3s; }
+    .nav-back:hover .arrow { transform: translateX(-4px); }
+    .nav-logo { font-family: var(--mono); font-size: .8rem; color: var(--text); font-weight: 700; letter-spacing: .08em; }
+    .nav-cta {
+      font-family: var(--mono); font-size: .7rem; letter-spacing: .08em;
+      padding: 8px 18px; border-radius: 100px;
+      background: linear-gradient(135deg, var(--p), var(--c));
+      color: var(--bg); font-weight: 700; text-decoration: none;
+      transition: opacity .3s, transform .3s;
+      white-space: nowrap;
+    }
+    .nav-cta:hover { opacity: .85; transform: scale(1.04); }
+
+    /* ── HERO ── */
+    .cs-hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: flex-end; padding: clamp(6rem,10vw,10rem) clamp(2rem,7vw,8rem) clamp(3rem,6vw,6rem);
+      position: relative; overflow: hidden;
+    }
+    .hero-gradient {
+      position: absolute; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse 80% 70% at 60% 30%, rgba(0,255,209,.15) 0%, transparent 60%),
+                  radial-gradient(ellipse 50% 50% at 20% 80%, rgba(139,92,246,.12) 0%, transparent 55%);
+    }
+    .hero-grid-lines {
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 80px 80px;
+      mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 30%, transparent 100%);
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-family: var(--mono); font-size: .72rem; color: var(--c);
+      letter-spacing: .2em; text-transform: uppercase;
+      margin-bottom: 28px; position: relative; z-index: 1;
+      opacity: 0; transform: translateY(20px);
+    }
+    .hero-tag::before { content: ''; width: 32px; height: 1px; background: var(--c); }
+    .cs-hero h1 {
+      font-size: clamp(4.5rem, 14vw, 13rem);
+      font-weight: 700; letter-spacing: -.04em; line-height: .92;
+      position: relative; z-index: 1;
+      opacity: 0; transform: translateY(40px);
+    }
+    .cs-hero h1 .accent { color: var(--c); }
+    .hero-meta-row {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 32px; margin-top: 48px; position: relative; z-index: 1;
+      opacity: 0; transform: translateY(20px);
+    }
+    .hero-desc {
+      max-width: 520px; font-size: clamp(.9rem,1.4vw,1.1rem);
+      color: var(--muted); line-height: 1.8;
+    }
+    .hero-chips { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+    .hero-chip {
+      font-family: var(--mono); font-size: .65rem; letter-spacing: .1em;
+      padding: 6px 14px; border-radius: 100px;
+      border: 1px solid var(--border); color: var(--muted);
+    }
+    .scroll-hint {
+      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+      font-family: var(--mono); font-size: .65rem; color: var(--muted);
+      letter-spacing: .2em; display: flex; flex-direction: column; align-items: center; gap: 10px;
+      z-index: 1; opacity: 0;
+    }
+    .scroll-line { width: 1px; height: 48px; background: linear-gradient(to bottom, var(--muted), transparent); animation: scrollPulse 2s ease-in-out infinite; }
+    @keyframes scrollPulse { 0%,100% { opacity:.4; transform:scaleY(1); } 50% { opacity:1; transform:scaleY(.6); } }
+
+    /* ── META STRIP ── */
+    .cs-meta {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      padding: 0 clamp(2rem,7vw,8rem);
+      opacity: 0; transform: translateY(30px);
+    }
+    .meta-item {
+      padding: 36px 0; border-right: 1px solid var(--border);
+      padding-right: 32px; padding-left: 32px;
+    }
+    .meta-item:first-child { padding-left: 0; }
+    .meta-item:last-child  { border-right: none; }
+    .meta-label { font-family: var(--mono); font-size: .62rem; color: var(--muted); letter-spacing: .2em; text-transform: uppercase; margin-bottom: 10px; }
+    .meta-value { font-size: 1rem; font-weight: 600; letter-spacing: -.02em; }
+
+    /* ── SECTIONS ── */
+    .cs-section {
+      padding: clamp(5rem,10vw,10rem) clamp(2rem,7vw,8rem);
+      position: relative;
+    }
+    .section-label {
+      font-family: var(--mono); font-size: .68rem; color: var(--p);
+      letter-spacing: .22em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 12px; margin-bottom: 40px;
+    }
+    .section-label::before { content: ''; width: 28px; height: 1px; background: var(--p); }
+    .cs-section h2 {
+      font-size: clamp(2.2rem,5vw,4.5rem); font-weight: 700;
+      letter-spacing: -.04em; line-height: 1.05; margin-bottom: 32px;
+    }
+    .cs-section h2 em { color: var(--c); font-style: normal; }
+    .cs-body {
+      font-size: clamp(.95rem,1.4vw,1.1rem); color: var(--muted);
+      line-height: 1.85; max-width: 680px;
+    }
+    .cs-body + .cs-body { margin-top: 24px; }
+
+    /* ── TWO-COL ── */
+    .two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: clamp(3rem,6vw,8rem);
+      align-items: start;
+    }
+
+    /* ── FULL-BLEED IMAGE ── */
+    .cs-img-full {
+      width: 100%; aspect-ratio: 16/8;
+      border-radius: 24px; overflow: hidden;
+      border: 1px solid var(--border);
+      position: relative;
+      opacity: 0; transform: translateY(40px);
+    }
+    .cs-img-full img { width:100%; height:100%; object-fit:cover; display:block; }
+    .cs-img-full .img-placeholder {
+      width:100%; height:100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── IMAGE GRID ── */
+    .cs-img-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+      margin-top: 64px;
+      opacity: 0; transform: translateY(40px);
+    }
+    .cs-img-grid .cs-img-tile {
+      aspect-ratio: 4/3; border-radius: 20px; overflow: hidden;
+      border: 1px solid var(--border); position: relative;
+    }
+    .cs-img-grid .cs-img-tile img { width:100%; height:100%; object-fit:cover; display:block; }
+    .cs-img-grid .cs-img-tile.tall { grid-row: span 2; aspect-ratio: auto; min-height: 400px; }
+
+    /* ── FEATURE LIST ── */
+    .feature-list {
+      display: flex; flex-direction: column; gap: 0;
+      margin-top: 56px; border-top: 1px solid var(--border);
+    }
+    .feature-row {
+      display: grid; grid-template-columns: 56px 1fr 1fr;
+      gap: 0 clamp(2rem,4vw,5rem);
+      padding: 36px 0; border-bottom: 1px solid var(--border);
+      align-items: start;
+      opacity: 0; transform: translateX(-20px);
+      transition: background .25s;
+    }
+    .feature-row:hover { background: rgba(255,255,255,.015); }
+    .feature-num { font-family: var(--mono); font-size: .72rem; color: var(--muted); padding-top: 4px; }
+    .feature-title { font-size: clamp(1.2rem,2vw,1.65rem); font-weight: 700; letter-spacing: -.03em; }
+    .feature-desc  { font-size: .9rem; color: var(--muted); line-height: 1.8; }
+
+    /* ── METRICS ── */
+    .metrics-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 2px; margin-top: 64px;
+      border: 1px solid var(--border); border-radius: 20px; overflow: hidden;
+    }
+    .metric-card {
+      background: var(--surface); padding: 40px 36px;
+      border-right: 1px solid var(--border);
+      opacity: 0; transform: translateY(20px);
+    }
+    .metric-card:last-child { border-right: none; }
+    .metric-n {
+      font-size: clamp(3rem,6vw,5.5rem); font-weight: 700;
+      letter-spacing: -.04em; line-height: 1;
+      background: linear-gradient(135deg, var(--c), var(--p));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .metric-l { font-size: .85rem; color: var(--muted); margin-top: 12px; line-height: 1.5; }
+
+    /* ── PROCESS ── */
+    .process-items {
+      margin-top: 56px; display: flex; flex-direction: column; gap: 0;
+      border-top: 1px solid var(--border);
+    }
+    .process-item {
+      display: grid; grid-template-columns: 80px 1fr;
+      gap: 0 clamp(2rem,4vw,5rem);
+      padding: 40px 0; border-bottom: 1px solid var(--border);
+      opacity: 0; transform: translateY(20px);
+    }
+    .pi-idx { font-family: var(--mono); font-size: .72rem; color: var(--muted); padding-top: 6px; }
+    .pi-content h3 { font-size: clamp(1.4rem,2.5vw,2rem); font-weight: 700; letter-spacing: -.03em; margin-bottom: 16px; }
+    .pi-content p  { font-size: .9rem; color: var(--muted); line-height: 1.85; max-width: 640px; }
+
+    /* ── QUOTE ── */
+    .cs-quote {
+      padding: clamp(4rem,8vw,8rem) clamp(2rem,7vw,8rem);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      position: relative; overflow: hidden;
+      opacity: 0; transform: translateY(30px);
+    }
+    .cs-quote::before {
+      content: '"'; position: absolute; top: -40px; left: clamp(2rem,7vw,8rem);
+      font-size: clamp(14rem,22vw,22rem); line-height: 1;
+      font-family: var(--sans); font-weight: 700; color: rgba(0,255,209,.06);
+      pointer-events: none;
+    }
+    .cs-quote blockquote {
+      font-size: clamp(1.5rem,3.5vw,3rem); font-weight: 600;
+      letter-spacing: -.03em; line-height: 1.3; max-width: 900px;
+      position: relative; z-index: 1;
+    }
+    .cs-quote blockquote em { color: var(--c); font-style: normal; }
+
+    /* ── NEXT PROJECT ── */
+    .cs-next {
+      padding: clamp(5rem,10vw,10rem) clamp(2rem,7vw,8rem);
+      display: flex; flex-direction: column;
+      border-top: 1px solid var(--border);
+      position: relative; overflow: hidden;
+      opacity: 0; transform: translateY(30px);
+    }
+    .cs-next .next-label {
+      font-family: var(--mono); font-size: .68rem; color: var(--muted);
+      letter-spacing: .2em; text-transform: uppercase; margin-bottom: 32px;
+    }
+    .cs-next h2 {
+      font-size: clamp(2.5rem,7vw,7rem); font-weight: 700;
+      letter-spacing: -.04em; line-height: .95;
+      transition: color .3s;
+    }
+    .cs-next:hover h2 { color: var(--c); }
+    .cs-next a { text-decoration: none; color: inherit; display: flex; flex-direction: column; }
+    .next-arrow {
+      width: 64px; height: 64px; border-radius: 50%;
+      border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-top: 40px;
+      transition: background .3s, border-color .3s, transform .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    .cs-next:hover .next-arrow { background: var(--c); border-color: var(--c); color: var(--bg); transform: rotate(45deg) scale(1.1); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 28px clamp(2rem,5vw,5rem);
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--mono); font-size: .7rem; color: var(--muted);
+    }
+    footer a { color: var(--p); text-decoration: none; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      nav { left:0; right:0; transform:none; top:0; border-radius:0; border-left:none; border-right:none; border-top:none; width:100%; }
+      .cs-meta { grid-template-columns: 1fr 1fr; }
+      .meta-item:nth-child(2) { border-right: none; }
+      .two-col { grid-template-columns: 1fr; }
+      .cs-img-grid { grid-template-columns: 1fr; }
+      .cs-img-grid .cs-img-tile.tall { aspect-ratio: 4/3; grid-row: auto; min-height: auto; }
+      .feature-row { grid-template-columns: 44px 1fr; grid-template-rows: auto auto; gap: 6px 12px; }
+      .feature-num   { grid-row:1; grid-column:1; }
+      .feature-title { grid-row:1; grid-column:2; }
+      .feature-desc  { grid-row:2; grid-column:1/-1; padding-top:6px; }
+      .metrics-grid  { grid-template-columns: 1fr; }
+      .metric-card   { border-right: none; border-bottom: 1px solid var(--border); }
+      .metric-card:last-child { border-bottom: none; }
+      .process-item  { grid-template-columns: 44px 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+
+<!-- ── NAV ── -->
+<nav>
+  <a href="index.html" class="nav-back"><span class="arrow">←</span> Back to Portfolio</a>
+  <span class="nav-logo">RA</span>
+  <a href="index.html#contact" class="nav-cta">Let's Talk</a>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="cs-hero">
+  <div class="hero-gradient"></div>
+  <div class="hero-grid-lines"></div>
+
+  <div class="hero-tag">Case Study · Product Design · 2026</div>
+  <h1>UX Research <span class="accent">Tool</span></h1>
+
+  <div class="hero-meta-row">
+    <p class="hero-desc">A full-stack user testing analytics platform built for distributed design teams — log live sessions, score usability, track NPS, and visualise research data in real time.</p>
+    <div class="hero-chips">
+      <span class="hero-chip">UX Research</span>
+      <span class="hero-chip">Data Viz</span>
+      <span class="hero-chip">Poker Theme</span>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>SCROLL</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ── META STRIP ── -->
+<div class="cs-meta">
+  <div class="meta-item">
+    <div class="meta-label">Role</div>
+    <div class="meta-value">Product Designer</div>
+  </div>
+  <div class="meta-item">
+    <div class="meta-label">Year</div>
+    <div class="meta-value">2026</div>
+  </div>
+  <div class="meta-item">
+    <div class="meta-label">Type</div>
+    <div class="meta-value">Web App (0 → 1)</div>
+  </div>
+  <div class="meta-item">
+    <div class="meta-label">Tools</div>
+    <div class="meta-value">Figma · Notion · Miro</div>
+  </div>
+</div>
+
+<!-- ── HERO IMAGE ── -->
+<div class="cs-section" style="padding-top:80px; padding-bottom:0">
+  <div class="cs-img-full">
+    <div class="img-placeholder" style="background: linear-gradient(135deg, #07100e 0%, #0a1a14 40%, #0e0e1c 100%);">
+      <svg width="100%" height="100%" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#07100e"/>
+            <stop offset="50%"  stop-color="#0a1a14"/>
+            <stop offset="100%" stop-color="#0e0e1c"/>
+          </linearGradient>
+          <linearGradient id="barGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="rgba(0,255,209,0.9)"/>
+            <stop offset="100%" stop-color="rgba(0,255,209,0.3)"/>
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="600" fill="url(#heroGrad)"/>
+        <!-- Window chrome -->
+        <rect x="60" y="50" width="1080" height="500" rx="16" fill="rgba(14,20,18,0.92)" stroke="rgba(0,255,209,0.1)" stroke-width="1"/>
+        <!-- Top bar -->
+        <rect x="60" y="50" width="1080" height="52" rx="16" fill="rgba(10,26,20,0.95)"/>
+        <rect x="60" y="82" width="1080" height="20" fill="rgba(10,26,20,0.95)"/>
+        <circle cx="92" cy="76" r="7" fill="rgba(255,51,112,0.5)"/>
+        <circle cx="116" cy="76" r="7" fill="rgba(255,215,0,0.4)"/>
+        <circle cx="140" cy="76" r="7" fill="rgba(0,255,209,0.4)"/>
+        <!-- Progress bar wizard -->
+        <rect x="200" y="68" width="600" height="6" rx="3" fill="rgba(255,255,255,0.06)"/>
+        <rect x="200" y="68" width="420" height="6" rx="3" fill="rgba(0,255,209,0.6)"/>
+        <!-- Step dots -->
+        <circle cx="200" cy="71" r="5" fill="#00ffd1"/>
+        <circle cx="300" cy="71" r="5" fill="#00ffd1"/>
+        <circle cx="400" cy="71" r="5" fill="#00ffd1"/>
+        <circle cx="500" cy="71" r="5" fill="#00ffd1"/>
+        <circle cx="600" cy="71" r="5" fill="rgba(0,255,209,0.3)" stroke="rgba(0,255,209,0.5)" stroke-width="1.5"/>
+        <circle cx="700" cy="71" r="5" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+        <circle cx="800" cy="71" r="5" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+        <!-- Left panel - Wizard step -->
+        <rect x="80" y="120" width="380" height="410" rx="12" fill="rgba(10,20,16,0.8)" stroke="rgba(0,255,209,0.08)" stroke-width="1"/>
+        <rect x="104" y="144" width="80" height="8" rx="4" fill="rgba(0,255,209,0.5)"/>
+        <rect x="104" y="160" width="200" height="18" rx="4" fill="rgba(255,255,255,0.7)"/>
+        <rect x="104" y="188" width="330" height="1" fill="rgba(255,255,255,0.05)"/>
+        <!-- Task observation fields -->
+        <rect x="104" y="204" width="100" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
+        <rect x="104" y="220" width="330" height="44" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <rect x="116" y="232" width="180" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
+        <rect x="104" y="276" width="100" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
+        <rect x="104" y="292" width="330" height="44" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+        <rect x="116" y="304" width="140" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
+        <!-- SUS rating row -->
+        <rect x="104" y="352" width="100" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
+        <rect x="104" y="370" width="38" height="24" rx="6" fill="rgba(0,255,209,0.15)" stroke="rgba(0,255,209,0.35)" stroke-width="1"/>
+        <rect x="152" y="370" width="38" height="24" rx="6" fill="rgba(0,255,209,0.08)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
+        <rect x="200" y="370" width="38" height="24" rx="6" fill="rgba(0,255,209,0.08)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
+        <rect x="248" y="370" width="38" height="24" rx="6" fill="rgba(0,255,209,0.08)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
+        <rect x="296" y="370" width="38" height="24" rx="6" fill="rgba(0,255,209,0.08)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
+        <!-- NPS score -->
+        <rect x="104" y="412" width="100" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
+        <rect x="104" y="430" width="330" height="32" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <rect x="112" y="438" width="16" height="16" rx="3" fill="rgba(255,51,112,0.3)"/>
+        <rect x="136" y="438" width="16" height="16" rx="3" fill="rgba(255,51,112,0.2)"/>
+        <rect x="160" y="438" width="16" height="16" rx="3" fill="rgba(255,215,0,0.2)"/>
+        <rect x="184" y="438" width="16" height="16" rx="3" fill="rgba(0,255,209,0.2)"/>
+        <rect x="208" y="438" width="16" height="16" rx="3" fill="rgba(0,255,209,0.5)"/>
+        <!-- Next button -->
+        <rect x="330" y="480" width="80" height="32" rx="100" fill="rgba(0,255,209,0.9)"/>
+        <rect x="350" y="490" width="40" height="10" rx="4" fill="rgba(7,7,15,0.8)"/>
+        <!-- Right panel - Analytics -->
+        <rect x="480" y="120" width="640" height="190" rx="12" fill="rgba(10,20,16,0.8)" stroke="rgba(0,255,209,0.08)" stroke-width="1"/>
+        <rect x="504" y="144" width="120" height="12" rx="4" fill="rgba(255,255,255,0.5)"/>
+        <rect x="504" y="164" width="80" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
+        <!-- Bar chart -->
+        <rect x="504" y="240" width="28" height="50" rx="4" fill="url(#barGrad)" opacity="0.5"/>
+        <rect x="544" y="220" width="28" height="70" rx="4" fill="url(#barGrad)" opacity="0.65"/>
+        <rect x="584" y="200" width="28" height="90" rx="4" fill="url(#barGrad)" opacity="0.8"/>
+        <rect x="624" y="215" width="28" height="75" rx="4" fill="url(#barGrad)" opacity="0.7"/>
+        <rect x="664" y="190" width="28" height="100" rx="4" fill="url(#barGrad)"/>
+        <rect x="704" y="205" width="28" height="85" rx="4" fill="url(#barGrad)" opacity="0.75"/>
+        <rect x="744" y="185" width="28" height="105" rx="4" fill="url(#barGrad)"/>
+        <rect x="784" y="195" width="28" height="95" rx="4" fill="url(#barGrad)" opacity="0.85"/>
+        <!-- NPS trend line -->
+        <polyline points="824,260 864,240 904,220 944,230 984,210 1024,195 1064,180 1104,170" fill="none" stroke="rgba(0,255,209,0.5)" stroke-width="2"/>
+        <rect x="504" y="296" width="596" height="1" fill="rgba(255,255,255,0.05)"/>
+        <!-- Score cards row -->
+        <rect x="480" y="326" width="196" height="100" rx="12" fill="rgba(10,20,16,0.8)" stroke="rgba(0,255,209,0.12)" stroke-width="1"/>
+        <rect x="500" y="344" width="80" height="8" rx="4" fill="rgba(110,109,138,0.45)"/>
+        <rect x="500" y="362" width="110" height="28" rx="6" fill="rgba(0,255,209,0.1)"/>
+        <rect x="508" y="369" width="70" height="14" rx="4" fill="rgba(0,255,209,0.7)"/>
+        <rect x="500" y="400" width="100" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
+        <rect x="688" y="326" width="196" height="100" rx="12" fill="rgba(10,20,16,0.8)" stroke="rgba(139,92,246,0.12)" stroke-width="1"/>
+        <rect x="708" y="344" width="80" height="8" rx="4" fill="rgba(110,109,138,0.45)"/>
+        <rect x="708" y="362" width="110" height="28" rx="6" fill="rgba(139,92,246,0.1)"/>
+        <rect x="716" y="369" width="70" height="14" rx="4" fill="rgba(139,92,246,0.7)"/>
+        <rect x="708" y="400" width="100" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
+        <rect x="896" y="326" width="224" height="100" rx="12" fill="rgba(10,20,16,0.8)" stroke="rgba(255,215,0,0.1)" stroke-width="1"/>
+        <rect x="916" y="344" width="80" height="8" rx="4" fill="rgba(110,109,138,0.45)"/>
+        <rect x="916" y="362" width="110" height="28" rx="6" fill="rgba(255,215,0,0.08)"/>
+        <rect x="924" y="369" width="70" height="14" rx="4" fill="rgba(255,215,0,0.6)"/>
+        <rect x="916" y="400" width="100" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
+        <!-- Session feed -->
+        <rect x="480" y="440" width="640" height="70" rx="12" fill="rgba(10,20,16,0.8)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <circle cx="508" cy="475" r="10" fill="rgba(0,255,209,0.15)"/>
+        <rect x="528" y="468" width="120" height="8" rx="4" fill="rgba(255,255,255,0.4)"/>
+        <rect x="528" y="482" width="180" height="6" rx="4" fill="rgba(110,109,138,0.4)"/>
+        <rect x="1040" y="468" width="60" height="18" rx="100" fill="rgba(0,255,209,0.12)" stroke="rgba(0,255,209,0.35)" stroke-width="1"/>
+        <!-- Ambient glow -->
+        <ellipse cx="760" cy="300" rx="300" ry="120" fill="rgba(0,255,209,0.03)"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ── OVERVIEW ── -->
+<section class="cs-section">
+  <div class="two-col">
+    <div>
+      <div class="section-label">Overview</div>
+      <h2>Research data that's <em>always scattered</em></h2>
+    </div>
+    <div style="padding-top: 80px;">
+      <p class="cs-body">UX research sessions produce raw, messy notes that live in different tools, different formats, and different people's heads. This tool was built to centralise everything — capturing, scoring, and visualising research in one place.</p>
+      <p class="cs-body">Built specifically for a poker application testing context, the product needed to feel like it belonged in a design team's workflow — not a generic form builder bolted onto a spreadsheet.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── QUOTE ── -->
+<div class="cs-quote">
+  <blockquote>"Good research deserves a <em>purpose-built home</em>."</blockquote>
+</div>
+
+<!-- ── FEATURES ── -->
+<section class="cs-section">
+  <div class="section-label">Core Features</div>
+  <h2>Built for <em>research in motion</em></h2>
+
+  <div class="feature-list">
+    <div class="feature-row">
+      <span class="feature-num">[01]</span>
+      <h3 class="feature-title">7-Step Interview Wizard</h3>
+      <p class="feature-desc">A structured moderator flow that walks through each stage of a live user session — tasks, observations, SUS questions, NPS, and wrap-up — in a single continuous interface.</p>
+    </div>
+    <div class="feature-row">
+      <span class="feature-num">[02]</span>
+      <h3 class="feature-title">SUS Scoring Engine</h3>
+      <p class="feature-desc">Automatically calculates System Usability Scale scores from session responses, benchmarks them against industry standards, and surfaces actionable insights.</p>
+    </div>
+    <div class="feature-row">
+      <span class="feature-num">[03]</span>
+      <h3 class="feature-title">Real-time Analytics Dashboard</h3>
+      <p class="feature-desc">Live session feeds, NPS trend charts, task performance breakdowns, and observation logs — all updating in real time via Supabase subscriptions.</p>
+    </div>
+    <div class="feature-row">
+      <span class="feature-num">[04]</span>
+      <h3 class="feature-title">Collaborative &amp; Distributed</h3>
+      <p class="feature-desc">Multiple moderators can run sessions simultaneously from different devices. All data merges into the same analytics view without conflicts.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── MOCKUP GRID ── -->
+<section class="cs-section" style="padding-top:0">
+  <div class="cs-img-grid">
+
+    <!-- Tile 1: Tall — Wizard Step UI -->
+    <div class="cs-img-tile tall">
+      <div style="width:100%;height:100%;background:linear-gradient(160deg,#071410,#0a0e1a);display:flex;align-items:center;justify-content:center;">
+        <svg width="100%" height="100%" viewBox="0 0 400 560" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#071410"/>
+              <stop offset="100%" stop-color="#0a0e1a"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="560" fill="url(#g1)"/>
+          <!-- Step progress bar -->
+          <rect x="24" y="36" width="352" height="4" rx="2" fill="rgba(255,255,255,0.06)"/>
+          <rect x="24" y="36" width="252" height="4" rx="2" fill="rgba(0,255,209,0.6)"/>
+          <!-- Step indicators -->
+          <circle cx="24"  cy="38" r="4" fill="#00ffd1"/>
+          <circle cx="74"  cy="38" r="4" fill="#00ffd1"/>
+          <circle cx="124" cy="38" r="4" fill="#00ffd1"/>
+          <circle cx="174" cy="38" r="4" fill="#00ffd1"/>
+          <circle cx="224" cy="38" r="4" fill="rgba(0,255,209,0.35)" stroke="rgba(0,255,209,0.5)" stroke-width="1.5"/>
+          <circle cx="274" cy="38" r="4" fill="rgba(255,255,255,0.1)"/>
+          <circle cx="324" cy="38" r="4" fill="rgba(255,255,255,0.1)"/>
+          <!-- Header -->
+          <rect x="24" y="60" width="72" height="8" rx="4" fill="rgba(0,255,209,0.55)"/>
+          <rect x="24" y="78" width="240" height="18" rx="4" fill="rgba(255,255,255,0.75)"/>
+          <rect x="24" y="104" width="352" height="1" fill="rgba(255,255,255,0.04)"/>
+          <!-- Task field -->
+          <rect x="24" y="118" width="80" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
+          <rect x="24" y="134" width="352" height="52" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+          <rect x="36" y="150" width="200" height="8" rx="4" fill="rgba(255,255,255,0.22)"/>
+          <!-- Observation field -->
+          <rect x="24" y="200" width="110" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
+          <rect x="24" y="216" width="352" height="68" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+          <rect x="36" y="232" width="260" height="7" rx="4" fill="rgba(255,255,255,0.2)"/>
+          <rect x="36" y="246" width="200" height="7" rx="4" fill="rgba(255,255,255,0.12)"/>
+          <!-- SUS rating scale -->
+          <rect x="24" y="300" width="130" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
+          <rect x="24" y="316" width="48" height="28" rx="7" fill="rgba(0,255,209,0.18)" stroke="rgba(0,255,209,0.45)" stroke-width="1.5"/>
+          <rect x="12" y="322" width="16" height="10" rx="4" fill="rgba(0,255,209,0.7)" style="margin-left:8px"/>
+          <rect x="80" y="316" width="48" height="28" rx="7" fill="rgba(0,255,209,0.06)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
+          <rect x="136" y="316" width="48" height="28" rx="7" fill="rgba(0,255,209,0.06)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
+          <rect x="192" y="316" width="48" height="28" rx="7" fill="rgba(0,255,209,0.06)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
+          <rect x="248" y="316" width="48" height="28" rx="7" fill="rgba(0,255,209,0.06)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
+          <rect x="36" y="324" width="22" height="10" rx="4" fill="rgba(0,255,209,0.8)"/>
+          <rect x="92" y="324" width="22" height="10" rx="4" fill="rgba(255,255,255,0.18)"/>
+          <rect x="148" y="324" width="22" height="10" rx="4" fill="rgba(255,255,255,0.18)"/>
+          <rect x="204" y="324" width="22" height="10" rx="4" fill="rgba(255,255,255,0.18)"/>
+          <rect x="260" y="324" width="22" height="10" rx="4" fill="rgba(255,255,255,0.18)"/>
+          <!-- NPS slider -->
+          <rect x="24" y="362" width="80" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
+          <rect x="24" y="378" width="352" height="8" rx="4" fill="rgba(255,255,255,0.05)"/>
+          <rect x="24" y="378" width="260" height="8" rx="4" fill="rgba(0,255,209,0.45)"/>
+          <circle cx="284" cy="382" r="10" fill="#00ffd1" stroke="rgba(7,7,15,0.9)" stroke-width="3"/>
+          <rect x="24" y="398" width="24" height="6" rx="3" fill="rgba(255,51,112,0.4)"/>
+          <rect x="352" y="398" width="24" height="6" rx="3" fill="rgba(0,255,209,0.4)"/>
+          <!-- Notes area -->
+          <rect x="24" y="420" width="80" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
+          <rect x="24" y="436" width="352" height="52" rx="10" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          <rect x="36" y="452" width="180" height="6" rx="4" fill="rgba(255,255,255,0.12)"/>
+          <!-- Nav buttons -->
+          <rect x="24" y="504" width="80" height="32" rx="100" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+          <rect x="36" y="514" width="54" height="10" rx="4" fill="rgba(255,255,255,0.3)"/>
+          <rect x="296" y="504" width="80" height="32" rx="100" fill="rgba(0,255,209,0.85)"/>
+          <rect x="310" y="514" width="52" height="10" rx="4" fill="rgba(7,7,15,0.75)"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Tile 2: Analytics NPS Chart -->
+    <div class="cs-img-tile">
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,#071410,#0e0e1c);">
+        <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#071410"/>
+              <stop offset="100%" stop-color="#0e0e1c"/>
+            </linearGradient>
+            <linearGradient id="areaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="rgba(0,255,209,0.25)"/>
+              <stop offset="100%" stop-color="rgba(0,255,209,0)"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="300" fill="url(#g2)"/>
+          <rect x="20" y="20" width="360" height="260" rx="14" fill="rgba(10,20,16,0.75)" stroke="rgba(0,255,209,0.08)" stroke-width="1"/>
+          <rect x="36" y="36" width="120" height="12" rx="4" fill="rgba(255,255,255,0.45)"/>
+          <rect x="36" y="54" width="80" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
+          <!-- Score badge -->
+          <rect x="300" y="34" width="64" height="28" rx="8" fill="rgba(0,255,209,0.12)" stroke="rgba(0,255,209,0.3)" stroke-width="1"/>
+          <rect x="310" y="42" width="44" height="12" rx="4" fill="rgba(0,255,209,0.7)"/>
+          <!-- Grid lines -->
+          <line x1="36" y1="90"  x2="364" y2="90"  stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+          <line x1="36" y1="130" x2="364" y2="130" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+          <line x1="36" y1="170" x2="364" y2="170" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+          <line x1="36" y1="210" x2="364" y2="210" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+          <!-- Area chart fill -->
+          <polygon points="36,200 80,185 124,165 168,155 212,140 256,120 300,105 344,90 364,95 364,250 36,250" fill="url(#areaGrad)"/>
+          <!-- Trend line -->
+          <polyline points="36,200 80,185 124,165 168,155 212,140 256,120 300,105 344,90" fill="none" stroke="rgba(0,255,209,0.85)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Data points -->
+          <circle cx="36"  cy="200" r="4" fill="#00ffd1"/>
+          <circle cx="124" cy="165" r="4" fill="#00ffd1"/>
+          <circle cx="212" cy="140" r="4" fill="#00ffd1"/>
+          <circle cx="300" cy="105" r="4" fill="#00ffd1"/>
+          <circle cx="344" cy="90"  r="5" fill="#00ffd1" stroke="rgba(7,7,15,0.8)" stroke-width="2"/>
+          <!-- Axis labels -->
+          <rect x="36"  y="254" width="20" height="6" rx="3" fill="rgba(110,109,138,0.35)"/>
+          <rect x="124" y="254" width="20" height="6" rx="3" fill="rgba(110,109,138,0.35)"/>
+          <rect x="212" y="254" width="20" height="6" rx="3" fill="rgba(110,109,138,0.35)"/>
+          <rect x="300" y="254" width="20" height="6" rx="3" fill="rgba(110,109,138,0.35)"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Tile 3: SUS Score card + session list -->
+    <div class="cs-img-tile">
+      <div style="width:100%;height:100%;background:linear-gradient(135deg,#0a0e1a,#071410);">
+        <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#0a0e1a"/>
+              <stop offset="100%" stop-color="#071410"/>
+            </linearGradient>
+            <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#00ffd1"/>
+              <stop offset="100%" stop-color="#8b5cf6"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="300" fill="url(#g3)"/>
+          <!-- SUS Score card -->
+          <rect x="20" y="20" width="172" height="120" rx="14" fill="rgba(10,20,16,0.8)" stroke="rgba(0,255,209,0.12)" stroke-width="1"/>
+          <rect x="36" y="38" width="80" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
+          <rect x="36" y="56" width="100" height="36" rx="6" fill="rgba(0,255,209,0.08)"/>
+          <rect x="44" y="66" width="60" height="18" rx="4" fill="url(#scoreGrad)"/>
+          <rect x="36" y="104" width="120" height="8" rx="4" fill="rgba(110,109,138,0.35)"/>
+          <!-- Gauge arc representation -->
+          <rect x="36" y="118" width="140" height="6" rx="3" fill="rgba(255,255,255,0.06)"/>
+          <rect x="36" y="118" width="112" height="6" rx="3" fill="url(#scoreGrad)"/>
+          <!-- NPS card -->
+          <rect x="208" y="20" width="172" height="120" rx="14" fill="rgba(10,20,16,0.8)" stroke="rgba(139,92,246,0.12)" stroke-width="1"/>
+          <rect x="224" y="38" width="60" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
+          <rect x="224" y="56" width="100" height="36" rx="6" fill="rgba(139,92,246,0.08)"/>
+          <rect x="232" y="66" width="60" height="18" rx="4" fill="rgba(139,92,246,0.7)"/>
+          <rect x="224" y="104" width="110" height="8" rx="4" fill="rgba(110,109,138,0.35)"/>
+          <rect x="224" y="118" width="140" height="6" rx="3" fill="rgba(255,255,255,0.06)"/>
+          <rect x="224" y="118" width="95" height="6" rx="3" fill="rgba(139,92,246,0.6)"/>
+          <!-- Session feed header -->
+          <rect x="20" y="156" width="120" height="10" rx="4" fill="rgba(255,255,255,0.35)"/>
+          <rect x="348" y="156" width="32" height="10" rx="4" fill="rgba(0,255,209,0.4)"/>
+          <!-- Session rows -->
+          <rect x="20" y="178" width="360" height="36" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          <circle cx="40" cy="196" r="8" fill="rgba(0,255,209,0.15)"/>
+          <rect x="56" y="190" width="90" height="8" rx="4" fill="rgba(255,255,255,0.4)"/>
+          <rect x="56" y="202" width="60" height="6" rx="3" fill="rgba(110,109,138,0.4)"/>
+          <rect x="316" y="190" width="48" height="14" rx="100" fill="rgba(0,255,209,0.1)" stroke="rgba(0,255,209,0.3)" stroke-width="1"/>
+          <rect x="20" y="224" width="360" height="36" rx="8" fill="rgba(255,255,255,0.02)"/>
+          <circle cx="40" cy="242" r="8" fill="rgba(139,92,246,0.15)"/>
+          <rect x="56" y="236" width="80" height="8" rx="4" fill="rgba(255,255,255,0.35)"/>
+          <rect x="56" y="248" width="54" height="6" rx="3" fill="rgba(110,109,138,0.35)"/>
+          <rect x="316" y="236" width="48" height="14" rx="100" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+          <rect x="20" y="270" width="360" height="10" rx="4" fill="rgba(255,255,255,0.02)"/>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── PROCESS ── -->
+<section class="cs-section">
+  <div class="section-label">Design Process</div>
+  <h2>How it <em>came to life</em></h2>
+  <div class="process-items">
+    <div class="process-item">
+      <span class="pi-idx">Pre-Game</span>
+      <div class="pi-content">
+        <h3>Discovery &amp; Competitive Analysis</h3>
+        <p>Started with a deep dive into existing UX research workflows — Maze, Lookback, and internal spreadsheets were the main tools being used. The gap was clear: nothing combined session logging and live analytics in one dark-themed, design-forward interface.</p>
+      </div>
+    </div>
+    <div class="process-item">
+      <span class="pi-idx">Game</span>
+      <div class="pi-content">
+        <h3>Wizard Design &amp; Iteration</h3>
+        <p>The 7-step wizard was the hardest design challenge — keeping moderators in flow during a live session meant every step had to be frictionless. Iterated through 4 wizard layouts before landing on a full-screen step-by-step approach with a persistent progress bar.</p>
+      </div>
+    </div>
+    <div class="process-item">
+      <span class="pi-idx">Post Game</span>
+      <div class="pi-content">
+        <h3>Handoff, QA &amp; Edge Cases</h3>
+        <p>Delivered a complete Figma file with the poker-themed dark design system, including all chart states (empty, loading, populated). QA'd the Supabase real-time subscriptions against edge cases — session disconnects, concurrent submissions, and data race conditions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── METRICS ── -->
+<section class="cs-section" style="padding-top:0">
+  <div class="section-label">Outcomes</div>
+  <h2>What it <em>achieved</em></h2>
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-n">7-step</div>
+      <div class="metric-l">Wizard captures 100% of session data without switching tools</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-n">&lt;200ms</div>
+      <div class="metric-l">Real-time sync across distributed teams with sub-200ms latency</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-n">0 calc</div>
+      <div class="metric-l">SUS + NPS scoring fully automated — zero manual calculation required</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── NEXT PROJECT ── -->
+<div class="cs-next">
+  <span class="next-label">Next Project</span>
+  <a href="promptra.html">
+    <h2>Promptra →</h2>
+    <div class="next-arrow">↗</div>
+  </a>
+</div>
+
+<footer>
+  <span>© 2026 Ronold Anthony</span>
+  <a href="index.html">← Back to Portfolio</a>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ── Cursor ──────────────────────────────────────────────────
+const dot  = document.getElementById('cur-dot');
+const ring = document.getElementById('cur-ring');
+let mx=0, my=0, rx=0, ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; gsap.set(dot,{x:mx,y:my}); });
+(function tick() { rx+=(mx-rx)*.13; ry+=(my-ry)*.13; gsap.set(ring,{x:rx,y:ry}); requestAnimationFrame(tick); })();
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', ()=>{ dot.classList.add('hov'); ring.classList.add('hov'); });
+  el.addEventListener('mouseleave', ()=>{ dot.classList.remove('hov'); ring.classList.remove('hov'); });
+});
+
+// ── Hero entrance ────────────────────────────────────────────
+gsap.to('.hero-tag',       { opacity:1, y:0, duration:.8, ease:'power3.out', delay:.2 });
+gsap.to('.cs-hero h1',     { opacity:1, y:0, duration:1, ease:'power4.out', delay:.4 });
+gsap.to('.hero-meta-row',  { opacity:1, y:0, duration:.8, ease:'power3.out', delay:.7 });
+gsap.to('.scroll-hint',    { opacity:1, duration:.8, delay:1.2 });
+
+// ── Meta strip ───────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.cs-meta', start: 'top 85%',
+  onEnter: () => gsap.to('.cs-meta', { opacity:1, y:0, duration:.8, ease:'power3.out' })
+});
+
+// ── Full-bleed images ────────────────────────────────────────
+gsap.utils.toArray('.cs-img-full').forEach(el => {
+  ScrollTrigger.create({
+    trigger: el, start: 'top 85%',
+    onEnter: () => gsap.to(el, { opacity:1, y:0, duration:1, ease:'power3.out' })
+  });
+});
+
+// ── Image grids ──────────────────────────────────────────────
+gsap.utils.toArray('.cs-img-grid').forEach(el => {
+  ScrollTrigger.create({
+    trigger: el, start: 'top 85%',
+    onEnter: () => gsap.to(el, { opacity:1, y:0, duration:1, ease:'power3.out' })
+  });
+});
+
+// ── Feature rows ─────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.feature-list', start: 'top 85%',
+  onEnter: () => gsap.to('.feature-row', { opacity:1, x:0, duration:.7, ease:'power3.out', stagger:.12 })
+});
+
+// ── Metrics ──────────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.metrics-grid', start: 'top 85%',
+  onEnter: () => gsap.to('.metric-card', { opacity:1, y:0, duration:.7, ease:'power3.out', stagger:.1 })
+});
+
+// ── Process items ────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.process-items', start: 'top 85%',
+  onEnter: () => gsap.to('.process-item', { opacity:1, y:0, duration:.7, ease:'power3.out', stagger:.15 })
+});
+
+// ── Quote ────────────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.cs-quote', start: 'top 85%',
+  onEnter: () => gsap.to('.cs-quote', { opacity:1, y:0, duration:.9, ease:'power3.out' })
+});
+
+// ── Next section ─────────────────────────────────────────────
+ScrollTrigger.create({
+  trigger: '.cs-next', start: 'top 85%',
+  onEnter: () => gsap.to('.cs-next', { opacity:1, y:0, duration:.8, ease:'power3.out' })
+});
+
+// ── Generic section reveals ──────────────────────────────────
+document.querySelectorAll('.cs-section').forEach(sec => {
+  ScrollTrigger.create({
+    trigger: sec, start: 'top 88%',
+    onEnter: () => {
+      gsap.from(sec.querySelectorAll('.section-label, h2, .cs-body, .two-col > div'), {
+        opacity:0, y:28, duration:.7, ease:'power3.out', stagger:.1
+      });
+    }
+  });
+});
+</script>
+
+</body>
+</html>
