@@ -514,7 +514,7 @@
       display: flex; flex-direction: column; justify-content: space-between;
       position: relative; z-index: 1;
     }
-    .proj-num { font-family: var(--mono); font-size: .7rem; color: var(--muted); letter-spacing: .15em; }
+    .proj-num { font-family: var(--mono); font-size: .7rem; color: #00ffd1; letter-spacing: .15em; }
     .proj-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 8px; }
     .ptag {
       font-family: var(--mono); font-size: .65rem;
@@ -527,6 +527,24 @@
       margin-top: auto; padding-top: 32px;
     }
     .proj-desc { color: var(--muted); font-size: .88rem; margin-top: 10px; line-height: 1.65; }
+    .proj-thumb-bg {
+      position: absolute; inset: 0; z-index: 0;
+      overflow: hidden; border-radius: var(--r);
+    }
+    .proj-thumb-bg img {
+      width: 100%; height: 100%; object-fit: cover; object-position: top center;
+      display: block; transition: transform .7s ease;
+      opacity: .55;
+    }
+    .proj-card:hover .proj-thumb-bg img { transform: scale(1.05); }
+    .proj-thumb-bg::after {
+      content: ''; position: absolute; inset: 0; z-index: 1;
+      background: linear-gradient(to bottom,
+        rgba(7,7,15,.1) 0%,
+        rgba(7,7,15,.45) 40%,
+        rgba(7,7,15,.92) 75%,
+        rgba(7,7,15,1) 100%);
+    }
     .proj-link {
       display: inline-flex; align-items: center; gap: 8px;
       margin-top: 22px; color: var(--c);
@@ -882,7 +900,7 @@
 
   <div class="hero-bottom">
     <div class="hero-role">
-      <strong>Senior Product Designer</strong>
+      <strong>Senior Product Designer at <a href="https://www.submittable.com/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,0.3);transition:text-decoration-color .3s;">Submittable</a></strong>
       For 5+ years, I've been shaping solutions that meet unique needs—finding clarity and impact within constraints.
     </div>
     <div style="display:flex;gap:14px;align-items:center">
@@ -902,26 +920,26 @@
 ═══════════════════════════════════ -->
 <div class="marquee-wrap">
   <div class="marquee-track">
-    <span class="mq-item">React <span class="sep">✦</span></span>
-    <span class="mq-item">Next.js <span class="sep">✦</span></span>
-    <span class="mq-item">Three.js <span class="sep">✦</span></span>
-    <span class="mq-item">GSAP <span class="sep">✦</span></span>
-    <span class="mq-item">TypeScript <span class="sep">✦</span></span>
-    <span class="mq-item">Node.js <span class="sep">✦</span></span>
     <span class="mq-item">Figma <span class="sep">✦</span></span>
-    <span class="mq-item">WebGL <span class="sep">✦</span></span>
-    <span class="mq-item">Motion Design <span class="sep">✦</span></span>
-    <span class="mq-item">UI/UX <span class="sep">✦</span></span>
-    <span class="mq-item">React <span class="sep">✦</span></span>
-    <span class="mq-item">Next.js <span class="sep">✦</span></span>
-    <span class="mq-item">Three.js <span class="sep">✦</span></span>
-    <span class="mq-item">GSAP <span class="sep">✦</span></span>
-    <span class="mq-item">TypeScript <span class="sep">✦</span></span>
-    <span class="mq-item">Node.js <span class="sep">✦</span></span>
+    <span class="mq-item">Product Management <span class="sep">✦</span></span>
+    <span class="mq-item">Notion <span class="sep">✦</span></span>
+    <span class="mq-item">Adobe Creative Suite <span class="sep">✦</span></span>
+    <span class="mq-item">Miro <span class="sep">✦</span></span>
+    <span class="mq-item">Communication &amp; Collaboration <span class="sep">✦</span></span>
+    <span class="mq-item">Quality Analysis <span class="sep">✦</span></span>
+    <span class="mq-item">Interaction Design <span class="sep">✦</span></span>
+    <span class="mq-item">User Research <span class="sep">✦</span></span>
+    <span class="mq-item">Vibe Coding <span class="sep">✦</span></span>
     <span class="mq-item">Figma <span class="sep">✦</span></span>
-    <span class="mq-item">WebGL <span class="sep">✦</span></span>
-    <span class="mq-item">Motion Design <span class="sep">✦</span></span>
-    <span class="mq-item">UI/UX <span class="sep">✦</span></span>
+    <span class="mq-item">Product Management <span class="sep">✦</span></span>
+    <span class="mq-item">Notion <span class="sep">✦</span></span>
+    <span class="mq-item">Adobe Creative Suite <span class="sep">✦</span></span>
+    <span class="mq-item">Miro <span class="sep">✦</span></span>
+    <span class="mq-item">Communication &amp; Collaboration <span class="sep">✦</span></span>
+    <span class="mq-item">Quality Analysis <span class="sep">✦</span></span>
+    <span class="mq-item">Interaction Design <span class="sep">✦</span></span>
+    <span class="mq-item">User Research <span class="sep">✦</span></span>
+    <span class="mq-item">Vibe Coding <span class="sep">✦</span></span>
   </div>
 </div>
 
@@ -969,7 +987,7 @@
       <div class="sl-row">
         <span class="sl-idx">[01]</span>
         <h3 class="sl-title">Where It All Started</h3>
-        <p class="sl-desc">I stumbled into design through a side project that needed to look good and work well. No formal path — just curiosity, late nights, and a growing obsession with making things that feel right.</p>
+        <p class="sl-desc">In my final year of mechanical engineering, I found myself drawn toward UI/UX design—a field that was completely new to me at the time. What began as a weekend experiment with an online course quickly turned into a genuine interest. As I explored tools like Adobe XD and started building my first designs, I realized I had found something I truly enjoyed. That curiosity soon evolved into a full-fledged career path.</p>
       </div>
 
       <hr class="sl-div">
@@ -1036,12 +1054,10 @@
   <div class="proj-grid">
     <a href="subnest.html" class="proj-card c1" data-tilt style="text-decoration:none;color:inherit;display:block;">
       <div class="proj-card-bg"></div>
-      <div class="proj-inner">
+      <div class="proj-thumb-bg"><img src="Gemini_Generated_Image_lywnprlywnprlywn.png" alt="SubNest"></div>
+      <div class="proj-inner" style="position:relative;z-index:1">
         <div>
           <div class="proj-num">01 / 2026</div>
-          <div class="proj-tags">
-            <span class="ptag">React</span><span class="ptag">Three.js</span><span class="ptag">GSAP</span>
-          </div>
         </div>
         <div>
           <h3 class="proj-name">SubNest</h3>
@@ -1054,10 +1070,10 @@
 
     <a href="freelance-tracker.html" class="proj-card c2" data-tilt style="text-decoration:none;color:inherit;display:block;">
       <div class="proj-card-bg"></div>
-      <div class="proj-inner">
+      <div class="proj-thumb-bg"><img src="freelance-tracker-thumb.png" alt="Freelance Work Tracker"></div>
+      <div class="proj-inner" style="position:relative;z-index:1">
         <div>
           <div class="proj-num">02 / 2026</div>
-          <div class="proj-tags"><span class="ptag">React</span><span class="ptag">Supabase</span><span class="ptag">Vite</span></div>
         </div>
         <div>
           <h3 class="proj-name">Freelance Work<br>Tracker</h3>
@@ -1069,13 +1085,13 @@
 
     <a href="ux-research-tool.html" class="proj-card c3" data-tilt style="text-decoration:none;color:inherit;display:block;">
       <div class="proj-card-bg"></div>
-      <div class="proj-inner">
+      <div class="proj-thumb-bg"><img src="ux-research-thumb.png" alt="UX Research Tool for Poker Platform"></div>
+      <div class="proj-inner" style="position:relative;z-index:1">
         <div>
           <div class="proj-num">03 / 2026</div>
-          <div class="proj-tags"><span class="ptag">React</span><span class="ptag">Supabase</span><span class="ptag">Recharts</span></div>
         </div>
         <div>
-          <h3 class="proj-name">UX Research<br>Tool</h3>
+          <h3 class="proj-name">UX Research Tool<br>for Poker Platform</h3>
           <p class="proj-desc" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">A full-stack user testing analytics app with a 7-step interview wizard, SUS scoring, NPS tracking, and real-time session dashboards — built for distributed design teams.</p>
           <span class="proj-link">View Project <span>→</span></span>
         </div>
@@ -1084,10 +1100,10 @@
 
     <a href="promptra.html" class="proj-card c4" data-tilt style="text-decoration:none;color:inherit;display:block;">
       <div class="proj-card-bg"></div>
-      <div class="proj-inner">
+      <div class="proj-thumb-bg"><img src="promptra -1.png" alt="Promptra"></div>
+      <div class="proj-inner" style="position:relative;z-index:1">
         <div>
           <div class="proj-num">04 / 2026</div>
-          <div class="proj-tags"><span class="ptag">Social</span><span class="ptag">AI</span><span class="ptag">Prompts</span></div>
         </div>
         <div>
           <h3 class="proj-name">Promptra</h3>
@@ -1099,10 +1115,13 @@
 
     <a href="case-studies.html" class="proj-card c5" data-tilt style="text-decoration:none;color:inherit;display:block;">
       <div class="proj-card-bg"></div>
-      <div class="proj-inner">
+      <div class="proj-thumb-bg" style="overflow:hidden;">
+        <img src="SWIGGY.png" alt="" style="position:absolute;width:62%;height:100%;object-fit:cover;object-position:left top;left:0;top:0;opacity:.6;">
+        <img src="GPAY.png" alt="" style="position:absolute;width:62%;height:100%;object-fit:cover;object-position:right top;right:0;top:0;opacity:.6;">
+      </div>
+      <div class="proj-inner" style="position:relative;z-index:1">
         <div>
           <div class="proj-num">05 / 2026</div>
-          <div class="proj-tags"><span class="ptag">UX</span><span class="ptag">Case Study</span><span class="ptag">Product</span></div>
         </div>
         <div>
           <h3 class="proj-name">Case Studies —<br>Swiggy &amp; GPay</h3>

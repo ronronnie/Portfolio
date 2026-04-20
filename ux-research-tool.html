@@ -43,35 +43,67 @@
     #cur-ring.hov { width:64px; height:64px; border-color:rgba(255,51,112,.5); }
     @media (max-width:768px) { body { cursor:auto; } #cur-dot,#cur-ring { display:none; } }
 
+    /* ── PROGRESS BAR ── */
+    .nav-progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px;
+      background: rgba(255,255,255,.06); z-index: 1100;
+    }
+    .nav-progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--p), var(--c));
+      transition: width .1s linear;
+    }
+
     /* ── NAV ── */
     nav {
-      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
       display: flex; align-items: center; justify-content: space-between;
-      gap: 32px; z-index: 1000;
-      background: rgba(14,14,28,.72); backdrop-filter: blur(18px);
+      z-index: 1000;
+      background: rgba(10,10,22,.8); backdrop-filter: blur(24px) saturate(1.4);
       border: 1px solid var(--border); border-radius: 100px;
-      padding: 10px 20px 10px 16px;
-      width: min(92vw, 720px);
+      padding: 8px 8px 8px 8px;
+      width: min(94vw, 780px);
+      gap: 0;
     }
-    .nav-back {
-      display: flex; align-items: center; gap: 10px;
-      font-family: var(--mono); font-size: .72rem; color: var(--muted);
-      text-decoration: none; letter-spacing: .06em;
+    .nav-left {
+      display: flex; align-items: center; gap: 0;
+      text-decoration: none; flex-shrink: 0;
+    }
+    .nav-logo-mark {
+      font-family: var(--mono); font-size: .78rem; font-weight: 700;
+      color: var(--bg); letter-spacing: .06em;
+      background: linear-gradient(135deg, var(--p), var(--c));
+      padding: 7px 13px; border-radius: 100px;
+      transition: opacity .3s;
+    }
+    .nav-left:hover .nav-logo-mark { opacity: .85; }
+    .nav-back-label {
+      font-family: var(--mono); font-size: .68rem; color: var(--muted);
+      letter-spacing: .06em; padding: 0 16px;
+      display: flex; align-items: center; gap: 8px;
       transition: color .3s;
     }
-    .nav-back:hover { color: var(--c); }
-    .nav-back .arrow { font-size: 1rem; transition: transform .3s; }
-    .nav-back:hover .arrow { transform: translateX(-4px); }
-    .nav-logo { font-family: var(--mono); font-size: .8rem; color: var(--text); font-weight: 700; letter-spacing: .08em; }
+    .nav-back-arrow { transition: transform .3s; display: inline-block; }
+    .nav-left:hover .nav-back-label { color: var(--c); }
+    .nav-left:hover .nav-back-arrow { transform: translateX(-4px); }
+    .nav-center {
+      flex: 1; text-align: center;
+      font-family: var(--mono); font-size: .72rem; color: var(--text);
+      letter-spacing: .1em; text-transform: uppercase;
+      opacity: 0; transition: opacity .4s ease;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      padding: 0 12px;
+    }
+    .nav-center.visible { opacity: 1; }
     .nav-cta {
       font-family: var(--mono); font-size: .7rem; letter-spacing: .08em;
-      padding: 8px 18px; border-radius: 100px;
-      background: linear-gradient(135deg, var(--p), var(--c));
-      color: var(--bg); font-weight: 700; text-decoration: none;
-      transition: opacity .3s, transform .3s;
-      white-space: nowrap;
+      padding: 8px 20px; border-radius: 100px;
+      border: 1px solid var(--border);
+      color: var(--text); font-weight: 600; text-decoration: none;
+      transition: background .3s, border-color .3s, color .3s, transform .3s;
+      white-space: nowrap; flex-shrink: 0;
     }
-    .nav-cta:hover { opacity: .85; transform: scale(1.04); }
+    .nav-cta:hover { background: var(--p); border-color: var(--p); color: var(--bg); transform: scale(1.04); }
 
     /* ── HERO ── */
     .cs-hero {
@@ -313,7 +345,9 @@
 
     /* ── MOBILE ── */
     @media (max-width: 768px) {
-      nav { left:0; right:0; transform:none; top:0; border-radius:0; border-left:none; border-right:none; border-top:none; width:100%; }
+      nav { left:0; right:0; transform:none; top:0; border-radius:0; border-left:none; border-right:none; border-top:none; width:100%; padding:6px 8px; }
+      .nav-back-label { padding: 0 10px; }
+      .nav-center { display: none; }
       .cs-meta { grid-template-columns: 1fr 1fr; }
       .meta-item:nth-child(2) { border-right: none; }
       .two-col { grid-template-columns: 1fr; }
@@ -335,10 +369,16 @@
 <div id="cur-dot"></div>
 <div id="cur-ring"></div>
 
+<!-- ── PROGRESS BAR ── -->
+<div class="nav-progress"><div class="nav-progress-fill" id="npf"></div></div>
+
 <!-- ── NAV ── -->
 <nav>
-  <a href="index.html" class="nav-back"><span class="arrow">←</span> Back to Portfolio</a>
-  <span class="nav-logo">RA</span>
+  <a href="index.html" class="nav-left">
+    <span class="nav-logo-mark">RA</span>
+    <span class="nav-back-label"><span class="nav-back-arrow">←</span> Portfolio</span>
+  </a>
+  <span class="nav-center" id="nav-title">UX Research Tool</span>
   <a href="index.html#contact" class="nav-cta">Let's Talk</a>
 </nav>
 
@@ -387,115 +427,9 @@
 
 <!-- ── HERO IMAGE ── -->
 <div class="cs-section" style="padding-top:80px; padding-bottom:0">
-  <div class="cs-img-full">
-    <div class="img-placeholder" style="background: linear-gradient(135deg, #07100e 0%, #0a1a14 40%, #0e0e1c 100%);">
-      <svg width="100%" height="100%" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%"   stop-color="#07100e"/>
-            <stop offset="50%"  stop-color="#0a1a14"/>
-            <stop offset="100%" stop-color="#0e0e1c"/>
-          </linearGradient>
-          <linearGradient id="barGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="rgba(0,255,209,0.9)"/>
-            <stop offset="100%" stop-color="rgba(0,255,209,0.3)"/>
-          </linearGradient>
-        </defs>
-        <rect width="1200" height="600" fill="url(#heroGrad)"/>
-        <!-- Window chrome -->
-        <rect x="60" y="50" width="1080" height="500" rx="16" fill="rgba(14,20,18,0.92)" stroke="rgba(0,255,209,0.1)" stroke-width="1"/>
-        <!-- Top bar -->
-        <rect x="60" y="50" width="1080" height="52" rx="16" fill="rgba(10,26,20,0.95)"/>
-        <rect x="60" y="82" width="1080" height="20" fill="rgba(10,26,20,0.95)"/>
-        <circle cx="92" cy="76" r="7" fill="rgba(255,51,112,0.5)"/>
-        <circle cx="116" cy="76" r="7" fill="rgba(255,215,0,0.4)"/>
-        <circle cx="140" cy="76" r="7" fill="rgba(0,255,209,0.4)"/>
-        <!-- Progress bar wizard -->
-        <rect x="200" y="68" width="600" height="6" rx="3" fill="rgba(255,255,255,0.06)"/>
-        <rect x="200" y="68" width="420" height="6" rx="3" fill="rgba(0,255,209,0.6)"/>
-        <!-- Step dots -->
-        <circle cx="200" cy="71" r="5" fill="#00ffd1"/>
-        <circle cx="300" cy="71" r="5" fill="#00ffd1"/>
-        <circle cx="400" cy="71" r="5" fill="#00ffd1"/>
-        <circle cx="500" cy="71" r="5" fill="#00ffd1"/>
-        <circle cx="600" cy="71" r="5" fill="rgba(0,255,209,0.3)" stroke="rgba(0,255,209,0.5)" stroke-width="1.5"/>
-        <circle cx="700" cy="71" r="5" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
-        <circle cx="800" cy="71" r="5" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
-        <!-- Left panel - Wizard step -->
-        <rect x="80" y="120" width="380" height="410" rx="12" fill="rgba(10,20,16,0.8)" stroke="rgba(0,255,209,0.08)" stroke-width="1"/>
-        <rect x="104" y="144" width="80" height="8" rx="4" fill="rgba(0,255,209,0.5)"/>
-        <rect x="104" y="160" width="200" height="18" rx="4" fill="rgba(255,255,255,0.7)"/>
-        <rect x="104" y="188" width="330" height="1" fill="rgba(255,255,255,0.05)"/>
-        <!-- Task observation fields -->
-        <rect x="104" y="204" width="100" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
-        <rect x="104" y="220" width="330" height="44" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-        <rect x="116" y="232" width="180" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
-        <rect x="104" y="276" width="100" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
-        <rect x="104" y="292" width="330" height="44" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-        <rect x="116" y="304" width="140" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
-        <!-- SUS rating row -->
-        <rect x="104" y="352" width="100" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
-        <rect x="104" y="370" width="38" height="24" rx="6" fill="rgba(0,255,209,0.15)" stroke="rgba(0,255,209,0.35)" stroke-width="1"/>
-        <rect x="152" y="370" width="38" height="24" rx="6" fill="rgba(0,255,209,0.08)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
-        <rect x="200" y="370" width="38" height="24" rx="6" fill="rgba(0,255,209,0.08)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
-        <rect x="248" y="370" width="38" height="24" rx="6" fill="rgba(0,255,209,0.08)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
-        <rect x="296" y="370" width="38" height="24" rx="6" fill="rgba(0,255,209,0.08)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
-        <!-- NPS score -->
-        <rect x="104" y="412" width="100" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
-        <rect x="104" y="430" width="330" height="32" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-        <rect x="112" y="438" width="16" height="16" rx="3" fill="rgba(255,51,112,0.3)"/>
-        <rect x="136" y="438" width="16" height="16" rx="3" fill="rgba(255,51,112,0.2)"/>
-        <rect x="160" y="438" width="16" height="16" rx="3" fill="rgba(255,215,0,0.2)"/>
-        <rect x="184" y="438" width="16" height="16" rx="3" fill="rgba(0,255,209,0.2)"/>
-        <rect x="208" y="438" width="16" height="16" rx="3" fill="rgba(0,255,209,0.5)"/>
-        <!-- Next button -->
-        <rect x="330" y="480" width="80" height="32" rx="100" fill="rgba(0,255,209,0.9)"/>
-        <rect x="350" y="490" width="40" height="10" rx="4" fill="rgba(7,7,15,0.8)"/>
-        <!-- Right panel - Analytics -->
-        <rect x="480" y="120" width="640" height="190" rx="12" fill="rgba(10,20,16,0.8)" stroke="rgba(0,255,209,0.08)" stroke-width="1"/>
-        <rect x="504" y="144" width="120" height="12" rx="4" fill="rgba(255,255,255,0.5)"/>
-        <rect x="504" y="164" width="80" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <!-- Bar chart -->
-        <rect x="504" y="240" width="28" height="50" rx="4" fill="url(#barGrad)" opacity="0.5"/>
-        <rect x="544" y="220" width="28" height="70" rx="4" fill="url(#barGrad)" opacity="0.65"/>
-        <rect x="584" y="200" width="28" height="90" rx="4" fill="url(#barGrad)" opacity="0.8"/>
-        <rect x="624" y="215" width="28" height="75" rx="4" fill="url(#barGrad)" opacity="0.7"/>
-        <rect x="664" y="190" width="28" height="100" rx="4" fill="url(#barGrad)"/>
-        <rect x="704" y="205" width="28" height="85" rx="4" fill="url(#barGrad)" opacity="0.75"/>
-        <rect x="744" y="185" width="28" height="105" rx="4" fill="url(#barGrad)"/>
-        <rect x="784" y="195" width="28" height="95" rx="4" fill="url(#barGrad)" opacity="0.85"/>
-        <!-- NPS trend line -->
-        <polyline points="824,260 864,240 904,220 944,230 984,210 1024,195 1064,180 1104,170" fill="none" stroke="rgba(0,255,209,0.5)" stroke-width="2"/>
-        <rect x="504" y="296" width="596" height="1" fill="rgba(255,255,255,0.05)"/>
-        <!-- Score cards row -->
-        <rect x="480" y="326" width="196" height="100" rx="12" fill="rgba(10,20,16,0.8)" stroke="rgba(0,255,209,0.12)" stroke-width="1"/>
-        <rect x="500" y="344" width="80" height="8" rx="4" fill="rgba(110,109,138,0.45)"/>
-        <rect x="500" y="362" width="110" height="28" rx="6" fill="rgba(0,255,209,0.1)"/>
-        <rect x="508" y="369" width="70" height="14" rx="4" fill="rgba(0,255,209,0.7)"/>
-        <rect x="500" y="400" width="100" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
-        <rect x="688" y="326" width="196" height="100" rx="12" fill="rgba(10,20,16,0.8)" stroke="rgba(139,92,246,0.12)" stroke-width="1"/>
-        <rect x="708" y="344" width="80" height="8" rx="4" fill="rgba(110,109,138,0.45)"/>
-        <rect x="708" y="362" width="110" height="28" rx="6" fill="rgba(139,92,246,0.1)"/>
-        <rect x="716" y="369" width="70" height="14" rx="4" fill="rgba(139,92,246,0.7)"/>
-        <rect x="708" y="400" width="100" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
-        <rect x="896" y="326" width="224" height="100" rx="12" fill="rgba(10,20,16,0.8)" stroke="rgba(255,215,0,0.1)" stroke-width="1"/>
-        <rect x="916" y="344" width="80" height="8" rx="4" fill="rgba(110,109,138,0.45)"/>
-        <rect x="916" y="362" width="110" height="28" rx="6" fill="rgba(255,215,0,0.08)"/>
-        <rect x="924" y="369" width="70" height="14" rx="4" fill="rgba(255,215,0,0.6)"/>
-        <rect x="916" y="400" width="100" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
-        <!-- Session feed -->
-        <rect x="480" y="440" width="640" height="70" rx="12" fill="rgba(10,20,16,0.8)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-        <circle cx="508" cy="475" r="10" fill="rgba(0,255,209,0.15)"/>
-        <rect x="528" y="468" width="120" height="8" rx="4" fill="rgba(255,255,255,0.4)"/>
-        <rect x="528" y="482" width="180" height="6" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <rect x="1040" y="468" width="60" height="18" rx="100" fill="rgba(0,255,209,0.12)" stroke="rgba(0,255,209,0.35)" stroke-width="1"/>
-        <!-- Ambient glow -->
-        <ellipse cx="760" cy="300" rx="300" ry="120" fill="rgba(0,255,209,0.03)"/>
-      </svg>
-    </div>
+  <div class="cs-img-full" style="aspect-ratio:auto;height:auto;">
+    <img src="uxr-dashboard.png" alt="UX Research Tool Dashboard" style="width:100%;height:auto;display:block;">
   </div>
-</div>
-
 <!-- ── OVERVIEW ── -->
 <section class="cs-section">
   <div class="two-col">
@@ -547,173 +481,21 @@
 <!-- ── MOCKUP GRID ── -->
 <section class="cs-section" style="padding-top:0">
   <div class="cs-img-grid">
-
-    <!-- Tile 1: Tall — Wizard Step UI -->
-    <div class="cs-img-tile tall">
-      <div style="width:100%;height:100%;background:linear-gradient(160deg,#071410,#0a0e1a);display:flex;align-items:center;justify-content:center;">
-        <svg width="100%" height="100%" viewBox="0 0 400 560" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#071410"/>
-              <stop offset="100%" stop-color="#0a0e1a"/>
-            </linearGradient>
-          </defs>
-          <rect width="400" height="560" fill="url(#g1)"/>
-          <!-- Step progress bar -->
-          <rect x="24" y="36" width="352" height="4" rx="2" fill="rgba(255,255,255,0.06)"/>
-          <rect x="24" y="36" width="252" height="4" rx="2" fill="rgba(0,255,209,0.6)"/>
-          <!-- Step indicators -->
-          <circle cx="24"  cy="38" r="4" fill="#00ffd1"/>
-          <circle cx="74"  cy="38" r="4" fill="#00ffd1"/>
-          <circle cx="124" cy="38" r="4" fill="#00ffd1"/>
-          <circle cx="174" cy="38" r="4" fill="#00ffd1"/>
-          <circle cx="224" cy="38" r="4" fill="rgba(0,255,209,0.35)" stroke="rgba(0,255,209,0.5)" stroke-width="1.5"/>
-          <circle cx="274" cy="38" r="4" fill="rgba(255,255,255,0.1)"/>
-          <circle cx="324" cy="38" r="4" fill="rgba(255,255,255,0.1)"/>
-          <!-- Header -->
-          <rect x="24" y="60" width="72" height="8" rx="4" fill="rgba(0,255,209,0.55)"/>
-          <rect x="24" y="78" width="240" height="18" rx="4" fill="rgba(255,255,255,0.75)"/>
-          <rect x="24" y="104" width="352" height="1" fill="rgba(255,255,255,0.04)"/>
-          <!-- Task field -->
-          <rect x="24" y="118" width="80" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
-          <rect x="24" y="134" width="352" height="52" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-          <rect x="36" y="150" width="200" height="8" rx="4" fill="rgba(255,255,255,0.22)"/>
-          <!-- Observation field -->
-          <rect x="24" y="200" width="110" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
-          <rect x="24" y="216" width="352" height="68" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-          <rect x="36" y="232" width="260" height="7" rx="4" fill="rgba(255,255,255,0.2)"/>
-          <rect x="36" y="246" width="200" height="7" rx="4" fill="rgba(255,255,255,0.12)"/>
-          <!-- SUS rating scale -->
-          <rect x="24" y="300" width="130" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
-          <rect x="24" y="316" width="48" height="28" rx="7" fill="rgba(0,255,209,0.18)" stroke="rgba(0,255,209,0.45)" stroke-width="1.5"/>
-          <rect x="12" y="322" width="16" height="10" rx="4" fill="rgba(0,255,209,0.7)" style="margin-left:8px"/>
-          <rect x="80" y="316" width="48" height="28" rx="7" fill="rgba(0,255,209,0.06)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
-          <rect x="136" y="316" width="48" height="28" rx="7" fill="rgba(0,255,209,0.06)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
-          <rect x="192" y="316" width="48" height="28" rx="7" fill="rgba(0,255,209,0.06)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
-          <rect x="248" y="316" width="48" height="28" rx="7" fill="rgba(0,255,209,0.06)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
-          <rect x="36" y="324" width="22" height="10" rx="4" fill="rgba(0,255,209,0.8)"/>
-          <rect x="92" y="324" width="22" height="10" rx="4" fill="rgba(255,255,255,0.18)"/>
-          <rect x="148" y="324" width="22" height="10" rx="4" fill="rgba(255,255,255,0.18)"/>
-          <rect x="204" y="324" width="22" height="10" rx="4" fill="rgba(255,255,255,0.18)"/>
-          <rect x="260" y="324" width="22" height="10" rx="4" fill="rgba(255,255,255,0.18)"/>
-          <!-- NPS slider -->
-          <rect x="24" y="362" width="80" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
-          <rect x="24" y="378" width="352" height="8" rx="4" fill="rgba(255,255,255,0.05)"/>
-          <rect x="24" y="378" width="260" height="8" rx="4" fill="rgba(0,255,209,0.45)"/>
-          <circle cx="284" cy="382" r="10" fill="#00ffd1" stroke="rgba(7,7,15,0.9)" stroke-width="3"/>
-          <rect x="24" y="398" width="24" height="6" rx="3" fill="rgba(255,51,112,0.4)"/>
-          <rect x="352" y="398" width="24" height="6" rx="3" fill="rgba(0,255,209,0.4)"/>
-          <!-- Notes area -->
-          <rect x="24" y="420" width="80" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
-          <rect x="24" y="436" width="352" height="52" rx="10" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-          <rect x="36" y="452" width="180" height="6" rx="4" fill="rgba(255,255,255,0.12)"/>
-          <!-- Nav buttons -->
-          <rect x="24" y="504" width="80" height="32" rx="100" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-          <rect x="36" y="514" width="54" height="10" rx="4" fill="rgba(255,255,255,0.3)"/>
-          <rect x="296" y="504" width="80" height="32" rx="100" fill="rgba(0,255,209,0.85)"/>
-          <rect x="310" y="514" width="52" height="10" rx="4" fill="rgba(7,7,15,0.75)"/>
-        </svg>
-      </div>
+    <div class="cs-img-tile" style="aspect-ratio:auto;height:auto;">
+      <img src="uxr-new-session.png" alt="New Session" style="width:100%;height:auto;display:block;">
     </div>
-
-    <!-- Tile 2: Analytics NPS Chart -->
-    <div class="cs-img-tile">
-      <div style="width:100%;height:100%;background:linear-gradient(135deg,#071410,#0e0e1c);">
-        <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#071410"/>
-              <stop offset="100%" stop-color="#0e0e1c"/>
-            </linearGradient>
-            <linearGradient id="areaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="rgba(0,255,209,0.25)"/>
-              <stop offset="100%" stop-color="rgba(0,255,209,0)"/>
-            </linearGradient>
-          </defs>
-          <rect width="400" height="300" fill="url(#g2)"/>
-          <rect x="20" y="20" width="360" height="260" rx="14" fill="rgba(10,20,16,0.75)" stroke="rgba(0,255,209,0.08)" stroke-width="1"/>
-          <rect x="36" y="36" width="120" height="12" rx="4" fill="rgba(255,255,255,0.45)"/>
-          <rect x="36" y="54" width="80" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
-          <!-- Score badge -->
-          <rect x="300" y="34" width="64" height="28" rx="8" fill="rgba(0,255,209,0.12)" stroke="rgba(0,255,209,0.3)" stroke-width="1"/>
-          <rect x="310" y="42" width="44" height="12" rx="4" fill="rgba(0,255,209,0.7)"/>
-          <!-- Grid lines -->
-          <line x1="36" y1="90"  x2="364" y2="90"  stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-          <line x1="36" y1="130" x2="364" y2="130" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-          <line x1="36" y1="170" x2="364" y2="170" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-          <line x1="36" y1="210" x2="364" y2="210" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
-          <!-- Area chart fill -->
-          <polygon points="36,200 80,185 124,165 168,155 212,140 256,120 300,105 344,90 364,95 364,250 36,250" fill="url(#areaGrad)"/>
-          <!-- Trend line -->
-          <polyline points="36,200 80,185 124,165 168,155 212,140 256,120 300,105 344,90" fill="none" stroke="rgba(0,255,209,0.85)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <!-- Data points -->
-          <circle cx="36"  cy="200" r="4" fill="#00ffd1"/>
-          <circle cx="124" cy="165" r="4" fill="#00ffd1"/>
-          <circle cx="212" cy="140" r="4" fill="#00ffd1"/>
-          <circle cx="300" cy="105" r="4" fill="#00ffd1"/>
-          <circle cx="344" cy="90"  r="5" fill="#00ffd1" stroke="rgba(7,7,15,0.8)" stroke-width="2"/>
-          <!-- Axis labels -->
-          <rect x="36"  y="254" width="20" height="6" rx="3" fill="rgba(110,109,138,0.35)"/>
-          <rect x="124" y="254" width="20" height="6" rx="3" fill="rgba(110,109,138,0.35)"/>
-          <rect x="212" y="254" width="20" height="6" rx="3" fill="rgba(110,109,138,0.35)"/>
-          <rect x="300" y="254" width="20" height="6" rx="3" fill="rgba(110,109,138,0.35)"/>
-        </svg>
-      </div>
+    <div class="cs-img-tile" style="aspect-ratio:auto;height:auto;">
+      <img src="uxr-analytics.png" alt="Analytics" style="width:100%;height:auto;display:block;">
     </div>
-
-    <!-- Tile 3: SUS Score card + session list -->
-    <div class="cs-img-tile">
-      <div style="width:100%;height:100%;background:linear-gradient(135deg,#0a0e1a,#071410);">
-        <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#0a0e1a"/>
-              <stop offset="100%" stop-color="#071410"/>
-            </linearGradient>
-            <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#00ffd1"/>
-              <stop offset="100%" stop-color="#8b5cf6"/>
-            </linearGradient>
-          </defs>
-          <rect width="400" height="300" fill="url(#g3)"/>
-          <!-- SUS Score card -->
-          <rect x="20" y="20" width="172" height="120" rx="14" fill="rgba(10,20,16,0.8)" stroke="rgba(0,255,209,0.12)" stroke-width="1"/>
-          <rect x="36" y="38" width="80" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
-          <rect x="36" y="56" width="100" height="36" rx="6" fill="rgba(0,255,209,0.08)"/>
-          <rect x="44" y="66" width="60" height="18" rx="4" fill="url(#scoreGrad)"/>
-          <rect x="36" y="104" width="120" height="8" rx="4" fill="rgba(110,109,138,0.35)"/>
-          <!-- Gauge arc representation -->
-          <rect x="36" y="118" width="140" height="6" rx="3" fill="rgba(255,255,255,0.06)"/>
-          <rect x="36" y="118" width="112" height="6" rx="3" fill="url(#scoreGrad)"/>
-          <!-- NPS card -->
-          <rect x="208" y="20" width="172" height="120" rx="14" fill="rgba(10,20,16,0.8)" stroke="rgba(139,92,246,0.12)" stroke-width="1"/>
-          <rect x="224" y="38" width="60" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
-          <rect x="224" y="56" width="100" height="36" rx="6" fill="rgba(139,92,246,0.08)"/>
-          <rect x="232" y="66" width="60" height="18" rx="4" fill="rgba(139,92,246,0.7)"/>
-          <rect x="224" y="104" width="110" height="8" rx="4" fill="rgba(110,109,138,0.35)"/>
-          <rect x="224" y="118" width="140" height="6" rx="3" fill="rgba(255,255,255,0.06)"/>
-          <rect x="224" y="118" width="95" height="6" rx="3" fill="rgba(139,92,246,0.6)"/>
-          <!-- Session feed header -->
-          <rect x="20" y="156" width="120" height="10" rx="4" fill="rgba(255,255,255,0.35)"/>
-          <rect x="348" y="156" width="32" height="10" rx="4" fill="rgba(0,255,209,0.4)"/>
-          <!-- Session rows -->
-          <rect x="20" y="178" width="360" height="36" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-          <circle cx="40" cy="196" r="8" fill="rgba(0,255,209,0.15)"/>
-          <rect x="56" y="190" width="90" height="8" rx="4" fill="rgba(255,255,255,0.4)"/>
-          <rect x="56" y="202" width="60" height="6" rx="3" fill="rgba(110,109,138,0.4)"/>
-          <rect x="316" y="190" width="48" height="14" rx="100" fill="rgba(0,255,209,0.1)" stroke="rgba(0,255,209,0.3)" stroke-width="1"/>
-          <rect x="20" y="224" width="360" height="36" rx="8" fill="rgba(255,255,255,0.02)"/>
-          <circle cx="40" cy="242" r="8" fill="rgba(139,92,246,0.15)"/>
-          <rect x="56" y="236" width="80" height="8" rx="4" fill="rgba(255,255,255,0.35)"/>
-          <rect x="56" y="248" width="54" height="6" rx="3" fill="rgba(110,109,138,0.35)"/>
-          <rect x="316" y="236" width="48" height="14" rx="100" fill="rgba(139,92,246,0.1)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
-          <rect x="20" y="270" width="360" height="10" rx="4" fill="rgba(255,255,255,0.02)"/>
-        </svg>
-      </div>
+    <div class="cs-img-tile" style="aspect-ratio:auto;height:auto;">
+      <img src="uxr-task-performance.png" alt="Task Performance" style="width:100%;height:auto;display:block;">
     </div>
-
+    <div class="cs-img-tile" style="aspect-ratio:auto;height:auto;">
+      <img src="uxr-interview.png" alt="Interview" style="width:100%;height:auto;display:block;">
+    </div>
   </div>
 </section>
+
 
 <!-- ── PROCESS ── -->
 <section class="cs-section">

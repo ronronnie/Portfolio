@@ -43,35 +43,67 @@
     #cur-ring.hov { width:64px; height:64px; border-color:rgba(255,51,112,.5); }
     @media (max-width:768px) { body { cursor:auto; } #cur-dot,#cur-ring { display:none; } }
 
+    /* ── PROGRESS BAR ── */
+    .nav-progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px;
+      background: rgba(255,255,255,.06); z-index: 1100;
+    }
+    .nav-progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--p), var(--c));
+      transition: width .1s linear;
+    }
+
     /* ── NAV ── */
     nav {
-      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
       display: flex; align-items: center; justify-content: space-between;
-      gap: 32px; z-index: 1000;
-      background: rgba(14,14,28,.72); backdrop-filter: blur(18px);
+      z-index: 1000;
+      background: rgba(10,10,22,.8); backdrop-filter: blur(24px) saturate(1.4);
       border: 1px solid var(--border); border-radius: 100px;
-      padding: 10px 20px 10px 16px;
-      width: min(92vw, 720px);
+      padding: 8px 8px 8px 8px;
+      width: min(94vw, 780px);
+      gap: 0;
     }
-    .nav-back {
-      display: flex; align-items: center; gap: 10px;
-      font-family: var(--mono); font-size: .72rem; color: var(--muted);
-      text-decoration: none; letter-spacing: .06em;
+    .nav-left {
+      display: flex; align-items: center; gap: 0;
+      text-decoration: none; flex-shrink: 0;
+    }
+    .nav-logo-mark {
+      font-family: var(--mono); font-size: .78rem; font-weight: 700;
+      color: var(--bg); letter-spacing: .06em;
+      background: linear-gradient(135deg, var(--p), var(--c));
+      padding: 7px 13px; border-radius: 100px;
+      transition: opacity .3s;
+    }
+    .nav-left:hover .nav-logo-mark { opacity: .85; }
+    .nav-back-label {
+      font-family: var(--mono); font-size: .68rem; color: var(--muted);
+      letter-spacing: .06em; padding: 0 16px;
+      display: flex; align-items: center; gap: 8px;
       transition: color .3s;
     }
-    .nav-back:hover { color: var(--c); }
-    .nav-back .arrow { font-size: 1rem; transition: transform .3s; }
-    .nav-back:hover .arrow { transform: translateX(-4px); }
-    .nav-logo { font-family: var(--mono); font-size: .8rem; color: var(--text); font-weight: 700; letter-spacing: .08em; }
+    .nav-back-arrow { transition: transform .3s; display: inline-block; }
+    .nav-left:hover .nav-back-label { color: var(--c); }
+    .nav-left:hover .nav-back-arrow { transform: translateX(-4px); }
+    .nav-center {
+      flex: 1; text-align: center;
+      font-family: var(--mono); font-size: .72rem; color: var(--text);
+      letter-spacing: .1em; text-transform: uppercase;
+      opacity: 0; transition: opacity .4s ease;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      padding: 0 12px;
+    }
+    .nav-center.visible { opacity: 1; }
     .nav-cta {
       font-family: var(--mono); font-size: .7rem; letter-spacing: .08em;
-      padding: 8px 18px; border-radius: 100px;
-      background: linear-gradient(135deg, var(--p), var(--c));
-      color: var(--bg); font-weight: 700; text-decoration: none;
-      transition: opacity .3s, transform .3s;
-      white-space: nowrap;
+      padding: 8px 20px; border-radius: 100px;
+      border: 1px solid var(--border);
+      color: var(--text); font-weight: 600; text-decoration: none;
+      transition: background .3s, border-color .3s, color .3s, transform .3s;
+      white-space: nowrap; flex-shrink: 0;
     }
-    .nav-cta:hover { opacity: .85; transform: scale(1.04); }
+    .nav-cta:hover { background: var(--p); border-color: var(--p); color: var(--bg); transform: scale(1.04); }
 
     /* ── HERO ── */
     .cs-hero {
@@ -313,7 +345,9 @@
 
     /* ── MOBILE ── */
     @media (max-width: 768px) {
-      nav { left:0; right:0; transform:none; top:0; border-radius:0; border-left:none; border-right:none; border-top:none; width:100%; }
+      nav { left:0; right:0; transform:none; top:0; border-radius:0; border-left:none; border-right:none; border-top:none; width:100%; padding:6px 8px; }
+      .nav-back-label { padding: 0 10px; }
+      .nav-center { display: none; }
       .cs-meta { grid-template-columns: 1fr 1fr; }
       .meta-item:nth-child(2) { border-right: none; }
       .two-col { grid-template-columns: 1fr; }
@@ -335,10 +369,16 @@
 <div id="cur-dot"></div>
 <div id="cur-ring"></div>
 
+<!-- ── PROGRESS BAR ── -->
+<div class="nav-progress"><div class="nav-progress-fill" id="npf"></div></div>
+
 <!-- ── NAV ── -->
 <nav>
-  <a href="index.html" class="nav-back"><span class="arrow">←</span> Back to Portfolio</a>
-  <span class="nav-logo">RA</span>
+  <a href="index.html" class="nav-left">
+    <span class="nav-logo-mark">RA</span>
+    <span class="nav-back-label"><span class="nav-back-arrow">←</span> Portfolio</span>
+  </a>
+  <span class="nav-center" id="nav-title">SubNest</span>
   <a href="index.html#contact" class="nav-cta">Let's Talk</a>
 </nav>
 
@@ -387,75 +427,8 @@
 
 <!-- ── HERO IMAGE ── -->
 <div class="cs-section" style="padding-top:80px; padding-bottom:0">
-  <div class="cs-img-full">
-    <div class="img-placeholder" style="background: linear-gradient(135deg, #0e0e1c 0%, #1a0f2e 40%, #0a1a1a 100%);">
-      <svg width="100%" height="100%" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-        <!-- Dashboard mockup -->
-        <rect width="1200" height="600" fill="url(#heroGrad)"/>
-        <defs>
-          <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%"   stop-color="#0e0e1c"/>
-            <stop offset="50%"  stop-color="#1a0e2e"/>
-            <stop offset="100%" stop-color="#071a14"/>
-          </linearGradient>
-        </defs>
-        <!-- Window chrome -->
-        <rect x="80" y="60" width="1040" height="480" rx="16" fill="rgba(20,20,40,0.9)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-        <!-- Sidebar -->
-        <rect x="80" y="60" width="220" height="480" rx="16" fill="rgba(14,14,28,0.95)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-        <rect x="104" y="100" width="172" height="36" rx="8" fill="rgba(139,92,246,0.2)"/>
-        <rect x="116" y="112" width="80" height="12" rx="4" fill="rgba(139,92,246,0.6)"/>
-        <rect x="104" y="152" width="172" height="30" rx="6" fill="rgba(255,255,255,0.04)"/>
-        <rect x="116" y="162" width="60" height="10" rx="4" fill="rgba(255,255,255,0.2)"/>
-        <rect x="104" y="192" width="172" height="30" rx="6" fill="rgba(255,255,255,0.04)"/>
-        <rect x="116" y="202" width="72" height="10" rx="4" fill="rgba(255,255,255,0.2)"/>
-        <rect x="104" y="232" width="172" height="30" rx="6" fill="rgba(255,255,255,0.04)"/>
-        <rect x="116" y="242" width="55" height="10" rx="4" fill="rgba(255,255,255,0.2)"/>
-        <!-- Main area header -->
-        <rect x="316" y="80" width="200" height="24" rx="6" fill="rgba(255,255,255,0.12)"/>
-        <rect x="316" y="116" width="120" height="14" rx="4" fill="rgba(110,109,138,0.5)"/>
-        <!-- Stat cards row -->
-        <rect x="316" y="152" width="218" height="100" rx="12" fill="rgba(20,20,40,0.8)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-        <rect x="328" y="168" width="80" height="10" rx="4" fill="rgba(110,109,138,0.5)"/>
-        <rect x="328" y="188" width="130" height="28" rx="6" fill="rgba(0,255,209,0.15)"/>
-        <rect x="328" y="196" width="90" height="14" rx="4" fill="rgba(0,255,209,0.6)"/>
-        <rect x="548" y="152" width="218" height="100" rx="12" fill="rgba(20,20,40,0.8)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-        <rect x="560" y="168" width="80" height="10" rx="4" fill="rgba(110,109,138,0.5)"/>
-        <rect x="560" y="188" width="130" height="28" rx="6" fill="rgba(139,92,246,0.15)"/>
-        <rect x="560" y="196" width="90" height="14" rx="4" fill="rgba(139,92,246,0.6)"/>
-        <rect x="780" y="152" width="218" height="100" rx="12" fill="rgba(20,20,40,0.8)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-        <rect x="792" y="168" width="80" height="10" rx="4" fill="rgba(110,109,138,0.5)"/>
-        <rect x="792" y="188" width="130" height="28" rx="6" fill="rgba(255,51,112,0.15)"/>
-        <rect x="792" y="196" width="90" height="14" rx="4" fill="rgba(255,51,112,0.6)"/>
-        <!-- Table header -->
-        <rect x="316" y="272" width="784" height="36" rx="8" fill="rgba(255,255,255,0.04)"/>
-        <rect x="332" y="282" width="60" height="10" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <rect x="520" y="282" width="60" height="10" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <rect x="700" y="282" width="60" height="10" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <rect x="900" y="282" width="60" height="10" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <!-- Table rows -->
-        <rect x="316" y="318" width="784" height="44" rx="0" fill="rgba(255,255,255,0.025)"/>
-        <circle cx="344" cy="340" r="14" fill="rgba(0,255,209,0.15)"/>
-        <rect x="368" y="334" width="80" height="10" rx="4" fill="rgba(255,255,255,0.5)"/>
-        <rect x="368" y="350" width="56" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <rect x="700" y="334" width="50" height="10" rx="4" fill="rgba(0,255,209,0.7)"/>
-        <rect x="900" y="332" width="68" height="18" rx="100" fill="rgba(0,255,209,0.12)" stroke="rgba(0,255,209,0.3)" stroke-width="1"/>
-        <rect x="316" y="372" width="784" height="44" rx="0" fill="transparent"/>
-        <circle cx="344" cy="394" r="14" fill="rgba(255,51,112,0.15)"/>
-        <rect x="368" y="388" width="72" height="10" rx="4" fill="rgba(255,255,255,0.5)"/>
-        <rect x="368" y="404" width="48" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <rect x="700" y="388" width="50" height="10" rx="4" fill="rgba(255,51,112,0.7)"/>
-        <rect x="900" y="386" width="68" height="18" rx="100" fill="rgba(255,215,0,0.12)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
-        <rect x="316" y="426" width="784" height="44" rx="0" fill="rgba(255,255,255,0.025)"/>
-        <circle cx="344" cy="448" r="14" fill="rgba(139,92,246,0.15)"/>
-        <rect x="368" y="442" width="88" height="10" rx="4" fill="rgba(255,255,255,0.5)"/>
-        <rect x="368" y="458" width="60" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <rect x="700" y="442" width="50" height="10" rx="4" fill="rgba(139,92,246,0.7)"/>
-        <rect x="900" y="440" width="68" height="18" rx="100" fill="rgba(255,51,112,0.12)" stroke="rgba(255,51,112,0.3)" stroke-width="1"/>
-        <!-- Glow accents -->
-        <ellipse cx="600" cy="150" rx="200" ry="60" fill="rgba(139,92,246,0.06)"/>
-      </svg>
-    </div>
+  <div class="cs-img-full" style="aspect-ratio:auto;height:auto;">
+    <img src="sn-dashboard.png" alt="SubNest Dashboard" style="width:100%;height:auto;display:block;">
   </div>
 </div>
 
@@ -510,81 +483,17 @@
 <!-- ── MOCKUP GRID ── -->
 <section class="cs-section" style="padding-top:0">
   <div class="cs-img-grid">
-    <div class="cs-img-tile tall">
-      <div style="width:100%;height:100%;background:linear-gradient(160deg,#1a0e2e,#0a1a14);display:flex;align-items:center;justify-content:center;">
-        <svg width="100%" height="100%" viewBox="0 0 400 560" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-          <rect width="400" height="560" fill="url(#g1)"/>
-          <defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1a0e2e"/><stop offset="100%" stop-color="#0a1a14"/></linearGradient></defs>
-          <rect x="24" y="48" width="352" height="56" rx="12" fill="rgba(255,255,255,0.04)"/>
-          <rect x="40" y="64" width="120" height="14" rx="4" fill="rgba(255,255,255,0.35)"/>
-          <rect x="40" y="82" width="80" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
-          <rect x="24" y="124" width="160" height="160" rx="16" fill="rgba(0,255,209,0.08)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
-          <rect x="40" y="144" width="90" height="10" rx="4" fill="rgba(110,109,138,0.5)"/>
-          <rect x="40" y="164" width="120" height="30" rx="6" fill="rgba(0,255,209,0.6)"/>
-          <rect x="40" y="200" width="80" height="10" rx="4" fill="rgba(110,109,138,0.35)"/>
-          <rect x="40" y="218" width="110" height="8" rx="4" fill="rgba(110,109,138,0.25)"/>
-          <rect x="200" y="124" width="176" height="160" rx="16" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.15)" stroke-width="1"/>
-          <rect x="216" y="144" width="90" height="10" rx="4" fill="rgba(110,109,138,0.5)"/>
-          <rect x="216" y="164" width="100" height="30" rx="6" fill="rgba(139,92,246,0.6)"/>
-          <rect x="216" y="200" width="80" height="10" rx="4" fill="rgba(110,109,138,0.35)"/>
-          <rect x="24" y="304" width="352" height="220" rx="16" fill="rgba(20,20,40,0.6)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-          <rect x="40" y="320" width="120" height="12" rx="4" fill="rgba(255,255,255,0.3)"/>
-          <rect x="40" y="350" width="312" height="1" fill="rgba(255,255,255,0.05)"/>
-          <rect x="40" y="366" width="72" height="10" rx="4" fill="rgba(255,255,255,0.4)"/>
-          <rect x="40" y="382" width="56" height="8" rx="4" fill="rgba(110,109,138,0.35)"/>
-          <rect x="300" y="362" width="56" height="18" rx="100" fill="rgba(0,255,209,0.12)" stroke="rgba(0,255,209,0.3)" stroke-width="1"/>
-          <rect x="40" y="406" width="72" height="10" rx="4" fill="rgba(255,255,255,0.4)"/>
-          <rect x="40" y="422" width="56" height="8" rx="4" fill="rgba(110,109,138,0.35)"/>
-          <rect x="300" y="402" width="56" height="18" rx="100" fill="rgba(255,215,0,0.12)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
-          <rect x="40" y="446" width="72" height="10" rx="4" fill="rgba(255,255,255,0.4)"/>
-          <rect x="40" y="462" width="56" height="8" rx="4" fill="rgba(110,109,138,0.35)"/>
-          <rect x="300" y="442" width="56" height="18" rx="100" fill="rgba(255,51,112,0.12)" stroke="rgba(255,51,112,0.3)" stroke-width="1"/>
-        </svg>
-      </div>
+    <div class="cs-img-tile" style="aspect-ratio:auto;height:auto;">
+      <img src="sn-subscriptions.png" alt="Subscriptions" style="width:100%;height:auto;display:block;">
     </div>
-    <div class="cs-img-tile">
-      <div style="width:100%;height:100%;background:linear-gradient(135deg,#0e1a2e,#1a0e20);">
-        <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-          <rect width="400" height="300" fill="url(#g2)"/>
-          <defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0e1a2e"/><stop offset="100%" stop-color="#1a0e20"/></linearGradient></defs>
-          <rect x="24" y="24" width="352" height="252" rx="14" fill="rgba(14,14,28,0.7)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-          <rect x="40" y="40" width="140" height="14" rx="4" fill="rgba(255,255,255,0.3)"/>
-          <!-- Bar chart -->
-          <rect x="52" y="200" width="28" height="52" rx="4" fill="rgba(139,92,246,0.5)"/>
-          <rect x="92" y="168" width="28" height="84" rx="4" fill="rgba(139,92,246,0.6)"/>
-          <rect x="132" y="140" width="28" height="112" rx="4" fill="rgba(0,255,209,0.7)"/>
-          <rect x="172" y="156" width="28" height="96" rx="4" fill="rgba(139,92,246,0.55)"/>
-          <rect x="212" y="128" width="28" height="124" rx="4" fill="rgba(0,255,209,0.8)"/>
-          <rect x="252" y="108" width="28" height="144" rx="4" fill="rgba(0,255,209,0.9)"/>
-          <rect x="292" y="136" width="28" height="116" rx="4" fill="rgba(255,51,112,0.5)"/>
-          <rect x="332" y="120" width="28" height="132" rx="4" fill="rgba(139,92,246,0.65)"/>
-          <rect x="40" y="258" width="320" height="1" fill="rgba(255,255,255,0.06)"/>
-        </svg>
-      </div>
+    <div class="cs-img-tile" style="aspect-ratio:auto;height:auto;">
+      <img src="sn-add-subscription.png" alt="Add Subscription" style="width:100%;height:auto;display:block;">
     </div>
-    <div class="cs-img-tile">
-      <div style="width:100%;height:100%;background:linear-gradient(135deg,#0f1a0e,#1a0e28);">
-        <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-          <rect width="400" height="300" fill="url(#g3)"/>
-          <defs><linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0f1a0e"/><stop offset="100%" stop-color="#1a0e28"/></linearGradient></defs>
-          <!-- Notification card -->
-          <rect x="24" y="24" width="352" height="80" rx="14" fill="rgba(0,255,209,0.07)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
-          <circle cx="54" cy="64" r="18" fill="rgba(0,255,209,0.12)"/>
-          <rect x="80" y="50" width="100" height="10" rx="4" fill="rgba(255,255,255,0.5)"/>
-          <rect x="80" y="66" width="160" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
-          <rect x="310" y="56" width="50" height="18" rx="100" fill="rgba(0,255,209,0.15)" stroke="rgba(0,255,209,0.4)" stroke-width="1"/>
-          <rect x="24" y="120" width="352" height="80" rx="14" fill="rgba(255,215,0,0.06)" stroke="rgba(255,215,0,0.12)" stroke-width="1"/>
-          <circle cx="54" cy="160" r="18" fill="rgba(255,215,0,0.12)"/>
-          <rect x="80" y="146" width="80" height="10" rx="4" fill="rgba(255,255,255,0.5)"/>
-          <rect x="80" y="162" width="140" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
-          <rect x="310" y="152" width="50" height="18" rx="100" fill="rgba(255,215,0,0.15)" stroke="rgba(255,215,0,0.4)" stroke-width="1"/>
-          <rect x="24" y="216" width="352" height="62" rx="14" fill="rgba(255,51,112,0.06)" stroke="rgba(255,51,112,0.12)" stroke-width="1"/>
-          <circle cx="54" cy="247" r="18" fill="rgba(255,51,112,0.12)"/>
-          <rect x="80" y="234" width="110" height="10" rx="4" fill="rgba(255,255,255,0.5)"/>
-          <rect x="80" y="250" width="130" height="8" rx="4" fill="rgba(110,109,138,0.5)"/>
-          <rect x="310" y="240" width="50" height="18" rx="100" fill="rgba(255,51,112,0.15)" stroke="rgba(255,51,112,0.4)" stroke-width="1"/>
-        </svg>
-      </div>
+    <div class="cs-img-tile" style="aspect-ratio:auto;height:auto;">
+      <img src="sn-profile.png" alt="Profile" style="width:100%;height:auto;display:block;">
+    </div>
+    <div class="cs-img-tile" style="aspect-ratio:auto;height:auto;">
+      <img src="sn-login.png" alt="Login" style="width:100%;height:auto;display:block;">
     </div>
   </div>
 </section>

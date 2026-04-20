@@ -43,35 +43,67 @@
     #cur-ring.hov { width:64px; height:64px; border-color:rgba(255,51,112,.5); }
     @media (max-width:768px) { body { cursor:auto; } #cur-dot,#cur-ring { display:none; } }
 
+    /* ── PROGRESS BAR ── */
+    .nav-progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px;
+      background: rgba(255,255,255,.06); z-index: 1100;
+    }
+    .nav-progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--p), var(--c));
+      transition: width .1s linear;
+    }
+
     /* ── NAV ── */
     nav {
-      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
       display: flex; align-items: center; justify-content: space-between;
-      gap: 32px; z-index: 1000;
-      background: rgba(14,14,28,.72); backdrop-filter: blur(18px);
+      z-index: 1000;
+      background: rgba(10,10,22,.8); backdrop-filter: blur(24px) saturate(1.4);
       border: 1px solid var(--border); border-radius: 100px;
-      padding: 10px 20px 10px 16px;
-      width: min(92vw, 720px);
+      padding: 8px 8px 8px 8px;
+      width: min(94vw, 780px);
+      gap: 0;
     }
-    .nav-back {
-      display: flex; align-items: center; gap: 10px;
-      font-family: var(--mono); font-size: .72rem; color: var(--muted);
-      text-decoration: none; letter-spacing: .06em;
+    .nav-left {
+      display: flex; align-items: center; gap: 0;
+      text-decoration: none; flex-shrink: 0;
+    }
+    .nav-logo-mark {
+      font-family: var(--mono); font-size: .78rem; font-weight: 700;
+      color: var(--bg); letter-spacing: .06em;
+      background: linear-gradient(135deg, var(--p), var(--c));
+      padding: 7px 13px; border-radius: 100px;
+      transition: opacity .3s;
+    }
+    .nav-left:hover .nav-logo-mark { opacity: .85; }
+    .nav-back-label {
+      font-family: var(--mono); font-size: .68rem; color: var(--muted);
+      letter-spacing: .06em; padding: 0 16px;
+      display: flex; align-items: center; gap: 8px;
       transition: color .3s;
     }
-    .nav-back:hover { color: var(--c); }
-    .nav-back .arrow { font-size: 1rem; transition: transform .3s; }
-    .nav-back:hover .arrow { transform: translateX(-4px); }
-    .nav-logo { font-family: var(--mono); font-size: .8rem; color: var(--text); font-weight: 700; letter-spacing: .08em; }
+    .nav-back-arrow { transition: transform .3s; display: inline-block; }
+    .nav-left:hover .nav-back-label { color: var(--c); }
+    .nav-left:hover .nav-back-arrow { transform: translateX(-4px); }
+    .nav-center {
+      flex: 1; text-align: center;
+      font-family: var(--mono); font-size: .72rem; color: var(--text);
+      letter-spacing: .1em; text-transform: uppercase;
+      opacity: 0; transition: opacity .4s ease;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      padding: 0 12px;
+    }
+    .nav-center.visible { opacity: 1; }
     .nav-cta {
       font-family: var(--mono); font-size: .7rem; letter-spacing: .08em;
-      padding: 8px 18px; border-radius: 100px;
-      background: linear-gradient(135deg, var(--p), var(--c));
-      color: var(--bg); font-weight: 700; text-decoration: none;
-      transition: opacity .3s, transform .3s;
-      white-space: nowrap;
+      padding: 8px 20px; border-radius: 100px;
+      border: 1px solid var(--border);
+      color: var(--text); font-weight: 600; text-decoration: none;
+      transition: background .3s, border-color .3s, color .3s, transform .3s;
+      white-space: nowrap; flex-shrink: 0;
     }
-    .nav-cta:hover { opacity: .85; transform: scale(1.04); }
+    .nav-cta:hover { background: var(--p); border-color: var(--p); color: var(--bg); transform: scale(1.04); }
 
     /* ── HERO ── */
     .cs-hero {
@@ -317,7 +349,9 @@
 
     /* ── MOBILE ── */
     @media (max-width: 768px) {
-      nav { left:0; right:0; transform:none; top:0; border-radius:0; border-left:none; border-right:none; border-top:none; width:100%; }
+      nav { left:0; right:0; transform:none; top:0; border-radius:0; border-left:none; border-right:none; border-top:none; width:100%; padding:6px 8px; }
+      .nav-back-label { padding: 0 10px; }
+      .nav-center { display: none; }
       .cs-meta { grid-template-columns: 1fr 1fr; }
       .meta-item:nth-child(2) { border-right: none; }
       .two-col { grid-template-columns: 1fr; }
@@ -339,10 +373,16 @@
 <div id="cur-dot"></div>
 <div id="cur-ring"></div>
 
+<!-- ── PROGRESS BAR ── -->
+<div class="nav-progress"><div class="nav-progress-fill" id="npf"></div></div>
+
 <!-- ── NAV ── -->
 <nav>
-  <a href="index.html" class="nav-back"><span class="arrow">←</span> Back to Portfolio</a>
-  <span class="nav-logo">RA</span>
+  <a href="index.html" class="nav-left">
+    <span class="nav-logo-mark">RA</span>
+    <span class="nav-back-label"><span class="nav-back-arrow">←</span> Portfolio</span>
+  </a>
+  <span class="nav-center" id="nav-title">Promptra</span>
   <a href="index.html#contact" class="nav-cta">Let's Talk</a>
 </nav>
 
@@ -391,160 +431,54 @@
 
 <!-- ── HERO IMAGE ── -->
 <div class="cs-section" style="padding-top:80px; padding-bottom:0">
-  <div class="cs-img-full">
-    <div class="img-placeholder" style="background: linear-gradient(135deg, #0e0e1c 0%, #1a1030 40%, #1a1400 100%);">
-      <svg width="100%" height="100%" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="heroGradP" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%"   stop-color="#0e0e1c"/>
-            <stop offset="50%"  stop-color="#1a1030"/>
-            <stop offset="100%" stop-color="#161200"/>
-          </linearGradient>
-          <linearGradient id="accentP" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#a855f7"/>
-            <stop offset="100%" stop-color="#ffd700"/>
-          </linearGradient>
-        </defs>
-        <rect width="1200" height="600" fill="url(#heroGradP)"/>
-        <!-- Top nav bar of app -->
-        <rect x="80" y="48" width="1040" height="52" rx="12" fill="rgba(20,16,40,0.95)" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
-        <rect x="104" y="62" width="90" height="12" rx="4" fill="rgba(168,85,247,0.7)"/>
-        <rect x="210" y="62" width="60" height="12" rx="4" fill="rgba(255,255,255,0.18)"/>
-        <rect x="284" y="62" width="60" height="12" rx="4" fill="rgba(255,255,255,0.18)"/>
-        <rect x="940" y="58" width="80" height="20" rx="100" fill="url(#accentP)" opacity="0.9"/>
-        <!-- Main layout: sidebar + feed -->
-        <rect x="80" y="116" width="210" height="436" rx="12" fill="rgba(16,12,32,0.9)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-        <!-- Sidebar items -->
-        <rect x="96" y="136" width="178" height="32" rx="8" fill="rgba(168,85,247,0.18)"/>
-        <rect x="108" y="146" width="80" height="10" rx="4" fill="rgba(168,85,247,0.7)"/>
-        <rect x="96" y="178" width="178" height="30" rx="6" fill="rgba(255,255,255,0.03)"/>
-        <rect x="108" y="188" width="64" height="10" rx="4" fill="rgba(255,255,255,0.2)"/>
-        <rect x="96" y="216" width="178" height="30" rx="6" fill="rgba(255,255,255,0.03)"/>
-        <rect x="108" y="226" width="72" height="10" rx="4" fill="rgba(255,255,255,0.2)"/>
-        <rect x="96" y="254" width="178" height="30" rx="6" fill="rgba(255,255,255,0.03)"/>
-        <rect x="108" y="264" width="56" height="10" rx="4" fill="rgba(255,255,255,0.2)"/>
-        <!-- Divider in sidebar -->
-        <rect x="96" y="300" width="178" height="1" fill="rgba(255,255,255,0.05)"/>
-        <rect x="108" y="316" width="50" height="8" rx="4" fill="rgba(110,109,138,0.35)"/>
-        <!-- Small avatar + name items -->
-        <circle cx="116" cy="342" r="10" fill="rgba(255,215,0,0.2)"/>
-        <rect x="132" y="337" width="60" height="8" rx="4" fill="rgba(255,255,255,0.3)"/>
-        <circle cx="116" cy="368" r="10" fill="rgba(168,85,247,0.25)"/>
-        <rect x="132" y="363" width="72" height="8" rx="4" fill="rgba(255,255,255,0.3)"/>
-        <circle cx="116" cy="394" r="10" fill="rgba(0,255,209,0.15)"/>
-        <rect x="132" y="389" width="55" height="8" rx="4" fill="rgba(255,255,255,0.3)"/>
-        <!-- Feed area -->
-        <!-- Prompt card 1 -->
-        <rect x="308" y="116" width="350" height="142" rx="14" fill="rgba(20,16,40,0.85)" stroke="rgba(168,85,247,0.22)" stroke-width="1"/>
-        <rect x="326" y="134" width="120" height="10" rx="4" fill="rgba(255,255,255,0.5)"/>
-        <rect x="326" y="152" width="290" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <rect x="326" y="166" width="250" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
-        <rect x="326" y="184" width="270" height="8" rx="4" fill="rgba(110,109,138,0.25)"/>
-        <rect x="326" y="200" width="68" height="20" rx="100" fill="rgba(168,85,247,0.12)" stroke="rgba(168,85,247,0.35)" stroke-width="1"/>
-        <rect x="404" y="200" width="56" height="20" rx="100" fill="rgba(255,215,0,0.1)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
-        <!-- Fork count / like count -->
-        <rect x="500" y="202" width="50" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
-        <rect x="560" y="202" width="50" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
-        <!-- Prompt card 2 -->
-        <rect x="308" y="272" width="350" height="142" rx="14" fill="rgba(20,16,40,0.85)" stroke="rgba(255,215,0,0.18)" stroke-width="1"/>
-        <rect x="326" y="290" width="140" height="10" rx="4" fill="rgba(255,255,255,0.5)"/>
-        <rect x="326" y="308" width="290" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <rect x="326" y="322" width="220" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
-        <rect x="326" y="336" width="260" height="8" rx="4" fill="rgba(110,109,138,0.25)"/>
-        <rect x="326" y="354" width="56" height="20" rx="100" fill="rgba(255,215,0,0.1)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
-        <rect x="392" y="354" width="68" height="20" rx="100" fill="rgba(168,85,247,0.12)" stroke="rgba(168,85,247,0.35)" stroke-width="1"/>
-        <rect x="500" y="356" width="50" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
-        <!-- Prompt card 3 (partial) -->
-        <rect x="308" y="428" width="350" height="104" rx="14" fill="rgba(20,16,40,0.85)" stroke="rgba(0,255,209,0.12)" stroke-width="1"/>
-        <rect x="326" y="448" width="100" height="10" rx="4" fill="rgba(255,255,255,0.5)"/>
-        <rect x="326" y="466" width="280" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <rect x="326" y="480" width="240" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
-        <!-- Version tree panel -->
-        <rect x="676" y="116" width="444" height="436" rx="14" fill="rgba(16,12,28,0.92)" stroke="rgba(255,215,0,0.12)" stroke-width="1"/>
-        <rect x="696" y="136" width="120" height="12" rx="4" fill="rgba(255,255,255,0.35)"/>
-        <rect x="696" y="156" width="80" height="8" rx="4" fill="rgba(110,109,138,0.35)"/>
-        <!-- Version timeline -->
-        <!-- Line -->
-        <line x1="730" y1="192" x2="730" y2="490" stroke="rgba(168,85,247,0.25)" stroke-width="2" stroke-dasharray="4 4"/>
-        <!-- v1.0 node -->
-        <circle cx="730" cy="200" r="10" fill="rgba(168,85,247,0.3)" stroke="rgba(168,85,247,0.7)" stroke-width="1.5"/>
-        <rect x="752" y="194" width="44" height="8" rx="3" fill="rgba(168,85,247,0.6)"/>
-        <rect x="752" y="208" width="120" height="7" rx="3" fill="rgba(110,109,138,0.4)"/>
-        <rect x="886" y="194" width="80" height="20" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-        <rect x="894" y="200" width="60" height="8" rx="3" fill="rgba(110,109,138,0.35)"/>
-        <!-- v1.2 node -->
-        <circle cx="730" cy="272" r="10" fill="rgba(255,215,0,0.25)" stroke="rgba(255,215,0,0.65)" stroke-width="1.5"/>
-        <rect x="752" y="266" width="44" height="8" rx="3" fill="rgba(255,215,0,0.6)"/>
-        <rect x="752" y="280" width="140" height="7" rx="3" fill="rgba(110,109,138,0.4)"/>
-        <rect x="886" y="266" width="80" height="20" rx="6" fill="rgba(255,215,0,0.06)" stroke="rgba(255,215,0,0.2)" stroke-width="1"/>
-        <rect x="894" y="272" width="60" height="8" rx="3" fill="rgba(255,215,0,0.4)"/>
-        <!-- branch off v1.2 -->
-        <line x1="730" y1="282" x2="790" y2="330" stroke="rgba(0,255,209,0.2)" stroke-width="1.5" stroke-dasharray="3 3"/>
-        <circle cx="798" cy="334" r="8" fill="rgba(0,255,209,0.15)" stroke="rgba(0,255,209,0.45)" stroke-width="1.5"/>
-        <rect x="816" y="328" width="40" height="7" rx="3" fill="rgba(0,255,209,0.4)"/>
-        <rect x="816" y="340" width="110" height="6" rx="3" fill="rgba(110,109,138,0.3)"/>
-        <!-- v2.0 node — "community pick" highlight -->
-        <circle cx="730" cy="400" r="12" fill="rgba(168,85,247,0.45)" stroke="rgba(168,85,247,1)" stroke-width="2"/>
-        <rect x="754" y="393" width="44" height="8" rx="3" fill="rgba(255,255,255,0.7)"/>
-        <rect x="754" y="407" width="160" height="7" rx="3" fill="rgba(110,109,138,0.45)"/>
-        <rect x="886" y="390" width="100" height="24" rx="100" fill="rgba(168,85,247,0.18)" stroke="rgba(168,85,247,0.5)" stroke-width="1"/>
-        <rect x="896" y="397" width="78" height="8" rx="3" fill="rgba(168,85,247,0.7)"/>
-        <!-- v2.1 node -->
-        <circle cx="730" cy="470" r="10" fill="rgba(255,215,0,0.2)" stroke="rgba(255,215,0,0.5)" stroke-width="1.5"/>
-        <rect x="752" y="464" width="44" height="8" rx="3" fill="rgba(255,215,0,0.5)"/>
-        <rect x="752" y="478" width="130" height="7" rx="3" fill="rgba(110,109,138,0.35)"/>
-        <!-- Glow accents -->
-        <ellipse cx="900" cy="300" rx="160" ry="80" fill="rgba(255,215,0,0.04)"/>
-        <ellipse cx="490" cy="250" rx="130" ry="60" fill="rgba(168,85,247,0.05)"/>
-      </svg>
-    </div>
+  <div class="cs-img-full" style="aspect-ratio:auto;height:auto;">
+    <img src="promptra -1.png" alt="Promptra Home Feed" style="width:100%;height:auto;display:block;">
   </div>
 </div>
-
 <!-- ── OVERVIEW ── -->
 <section class="cs-section">
   <div class="two-col">
     <div>
       <div class="section-label">Overview</div>
-      <h2>Prompts deserve more than a <em>static list</em></h2>
+      <h2>The AI world doesn't need more <em>wrappers</em></h2>
     </div>
     <div style="padding-top: 80px;">
-      <p class="cs-body">Every AI prompt tool today is essentially a library — you browse, you copy, you leave. Promptra was designed around a different idea: what if prompts could evolve, like code on GitHub? What if the community could build on each other's work in real time?</p>
-      <p class="cs-body">The product centres on two core features — Creator Studio for remixing and building on prompts directly within the platform, and Versioning for tracking how prompts evolve through community iterations.</p>
+      <p class="cs-body">Every new AI startup is essentially a wrapper — a thin interface layered on top of the same underlying models. The real leverage isn't in the model. It's in the prompt. And yet, prompts today live in scattered notes, private Notion docs, and disposable chat histories.</p>
+      <p class="cs-body">Promptra is a social platform where creators publish prompts, users find and use them across any AI tool, and the community can remix and improve them — in the open, together. Like GitHub for the prompt economy.</p>
     </div>
   </div>
 </section>
 
 <!-- ── QUOTE ── -->
 <div class="cs-quote">
-  <blockquote>"Prompts are ideas. Ideas deserve <em>version control</em>."</blockquote>
+  <blockquote>"The model is the same for everyone. <em>The prompt is the edge.</em>"</blockquote>
 </div>
 
 <!-- ── FEATURES ── -->
 <section class="cs-section">
   <div class="section-label">Core Features</div>
-  <h2>Built for <em>collaboration</em></h2>
+  <h2>Publish, version, <em>remix</em></h2>
 
   <div class="feature-list">
     <div class="feature-row">
       <span class="feature-num">[01]</span>
-      <h3 class="feature-title">Creator Studio</h3>
-      <p class="feature-desc">A rich in-platform editor where users can fork any prompt, modify it, annotate their changes, and publish the new version — crediting the original creator automatically.</p>
+      <h3 class="feature-title">Publish Prompts</h3>
+      <p class="feature-desc">Any creator can publish prompts for any AI model or tool — with context on what it does, what output to expect, and which model it works best with. Others can use it instantly.</p>
     </div>
     <div class="feature-row">
       <span class="feature-num">[02]</span>
-      <h3 class="feature-title">Prompt Versioning</h3>
-      <p class="feature-desc">Every prompt has a version tree. See how it started, who changed what, and which version the community rated highest. Think GitHub diffs, but for creative prompts.</p>
+      <h3 class="feature-title">Version Control</h3>
+      <p class="feature-desc">Every published prompt maintains a full version history. Creators can update their original, users can see what changed, and the community always knows which version is the gold standard.</p>
     </div>
     <div class="feature-row">
       <span class="feature-num">[03]</span>
-      <h3 class="feature-title">Social Feed</h3>
-      <p class="feature-desc">A curated feed of trending prompts, new versions, and community remixes — sorted by usefulness, recency, or category. Follow creators, bookmark prompts, leave structured feedback.</p>
+      <h3 class="feature-title">Remix</h3>
+      <p class="feature-desc">Users can remix any prompt directly inside the platform — tweak the wording, try a different angle, test the output — and publish their remix back to the community, crediting the original creator.</p>
     </div>
     <div class="feature-row">
       <span class="feature-num">[04]</span>
-      <h3 class="feature-title">Category Intelligence</h3>
-      <p class="feature-desc">Prompts are auto-tagged by model, use case, and output type. Smart filtering helps users find exactly what they need — and discover what they didn't know they needed.</p>
+      <h3 class="feature-title">Social Discovery</h3>
+      <p class="feature-desc">A feed of trending prompts, recent remixes, and creator updates. Follow prompt engineers whose work you trust, bookmark what you use, and discover what you didn't know you needed.</p>
     </div>
   </div>
 </section>
@@ -552,168 +486,20 @@
 <!-- ── MOCKUP GRID ── -->
 <section class="cs-section" style="padding-top:0">
   <div class="cs-img-grid">
-
-    <!-- Tile 1: Social Feed with prompt cards (tall) -->
-    <div class="cs-img-tile tall">
-      <div style="width:100%;height:100%;background:linear-gradient(160deg,#1a1030,#161200);display:flex;align-items:center;justify-content:center;">
-        <svg width="100%" height="100%" viewBox="0 0 400 560" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="gp1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#1a1030"/>
-              <stop offset="100%" stop-color="#161200"/>
-            </linearGradient>
-            <linearGradient id="tagGradP" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#a855f7"/>
-              <stop offset="100%" stop-color="#ffd700"/>
-            </linearGradient>
-          </defs>
-          <rect width="400" height="560" fill="url(#gp1)"/>
-          <!-- Header -->
-          <rect x="20" y="24" width="360" height="40" rx="10" fill="rgba(24,18,48,0.9)"/>
-          <rect x="36" y="36" width="80" height="10" rx="4" fill="url(#tagGradP)" opacity="0.8"/>
-          <circle cx="356" cy="44" r="14" fill="rgba(168,85,247,0.2)" stroke="rgba(168,85,247,0.4)" stroke-width="1"/>
-          <!-- Prompt card 1 -->
-          <rect x="20" y="80" width="360" height="130" rx="14" fill="rgba(24,18,48,0.85)" stroke="rgba(168,85,247,0.2)" stroke-width="1"/>
-          <!-- Avatar row -->
-          <circle cx="40" cy="100" r="12" fill="rgba(255,215,0,0.25)"/>
-          <rect x="58" y="94" width="70" height="9" rx="4" fill="rgba(255,255,255,0.5)"/>
-          <rect x="58" y="107" width="50" height="7" rx="4" fill="rgba(110,109,138,0.4)"/>
-          <rect x="320" y="94" width="44" height="18" rx="100" fill="rgba(255,215,0,0.12)" stroke="rgba(255,215,0,0.35)" stroke-width="1"/>
-          <!-- Prompt text lines -->
-          <rect x="36" y="126" width="320" height="8" rx="4" fill="rgba(255,255,255,0.28)"/>
-          <rect x="36" y="140" width="290" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
-          <rect x="36" y="154" width="200" height="8" rx="4" fill="rgba(255,255,255,0.14)"/>
-          <!-- Tags + stats -->
-          <rect x="36" y="174" width="60" height="18" rx="100" fill="rgba(168,85,247,0.12)" stroke="rgba(168,85,247,0.35)" stroke-width="1"/>
-          <rect x="104" y="174" width="50" height="18" rx="100" fill="rgba(255,215,0,0.1)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
-          <rect x="290" y="177" width="40" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
-          <rect x="336" y="177" width="30" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
-          <!-- Prompt card 2 -->
-          <rect x="20" y="226" width="360" height="130" rx="14" fill="rgba(24,18,48,0.85)" stroke="rgba(255,215,0,0.15)" stroke-width="1"/>
-          <circle cx="40" cy="246" r="12" fill="rgba(168,85,247,0.25)"/>
-          <rect x="58" y="240" width="80" height="9" rx="4" fill="rgba(255,255,255,0.5)"/>
-          <rect x="58" y="253" width="55" height="7" rx="4" fill="rgba(110,109,138,0.4)"/>
-          <rect x="310" y="240" width="54" height="18" rx="100" fill="rgba(168,85,247,0.12)" stroke="rgba(168,85,247,0.35)" stroke-width="1"/>
-          <rect x="36" y="272" width="310" height="8" rx="4" fill="rgba(255,255,255,0.28)"/>
-          <rect x="36" y="286" width="280" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
-          <rect x="36" y="300" width="180" height="8" rx="4" fill="rgba(255,255,255,0.14)"/>
-          <rect x="36" y="320" width="54" height="18" rx="100" fill="rgba(255,215,0,0.1)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
-          <rect x="98" y="320" width="60" height="18" rx="100" fill="rgba(0,255,209,0.08)" stroke="rgba(0,255,209,0.2)" stroke-width="1"/>
-          <rect x="290" y="323" width="40" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
-          <rect x="336" y="323" width="30" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
-          <!-- Prompt card 3 -->
-          <rect x="20" y="372" width="360" height="130" rx="14" fill="rgba(24,18,48,0.85)" stroke="rgba(0,255,209,0.1)" stroke-width="1"/>
-          <circle cx="40" cy="392" r="12" fill="rgba(0,255,209,0.15)"/>
-          <rect x="58" y="386" width="60" height="9" rx="4" fill="rgba(255,255,255,0.5)"/>
-          <rect x="58" y="399" width="45" height="7" rx="4" fill="rgba(110,109,138,0.4)"/>
-          <rect x="36" y="418" width="300" height="8" rx="4" fill="rgba(255,255,255,0.28)"/>
-          <rect x="36" y="432" width="260" height="8" rx="4" fill="rgba(255,255,255,0.2)"/>
-          <rect x="36" y="446" width="200" height="8" rx="4" fill="rgba(255,255,255,0.14)"/>
-          <rect x="36" y="466" width="60" height="18" rx="100" fill="rgba(168,85,247,0.12)" stroke="rgba(168,85,247,0.35)" stroke-width="1"/>
-          <rect x="104" y="466" width="44" height="18" rx="100" fill="rgba(255,215,0,0.1)" stroke="rgba(255,215,0,0.3)" stroke-width="1"/>
-          <!-- Glow -->
-          <ellipse cx="200" cy="280" rx="140" ry="60" fill="rgba(168,85,247,0.05)"/>
-        </svg>
-      </div>
+    <div class="cs-img-tile" style="aspect-ratio:auto;height:auto;">
+      <img src="promptra - 2.png" alt="Promptra Explore" style="width:100%;height:auto;display:block;">
     </div>
-
-    <!-- Tile 2: Version Tree / Timeline -->
-    <div class="cs-img-tile">
-      <div style="width:100%;height:100%;background:linear-gradient(135deg,#12082a,#1a1400);">
-        <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="gp2" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#12082a"/>
-              <stop offset="100%" stop-color="#1a1400"/>
-            </linearGradient>
-          </defs>
-          <rect width="400" height="300" fill="url(#gp2)"/>
-          <rect x="20" y="20" width="360" height="260" rx="14" fill="rgba(16,10,36,0.8)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-          <!-- Title -->
-          <rect x="36" y="36" width="110" height="10" rx="4" fill="rgba(255,255,255,0.35)"/>
-          <rect x="36" y="52" width="70" height="7" rx="4" fill="rgba(110,109,138,0.35)"/>
-          <!-- Vertical timeline line -->
-          <line x1="74" y1="82" x2="74" y2="260" stroke="rgba(168,85,247,0.2)" stroke-width="2" stroke-dasharray="4 4"/>
-          <!-- v1.0 -->
-          <circle cx="74" cy="90" r="9" fill="rgba(168,85,247,0.25)" stroke="rgba(168,85,247,0.65)" stroke-width="1.5"/>
-          <rect x="94" y="84" width="36" height="8" rx="3" fill="rgba(168,85,247,0.55)"/>
-          <rect x="94" y="96" width="110" height="6" rx="3" fill="rgba(110,109,138,0.35)"/>
-          <!-- v1.1 -->
-          <circle cx="74" cy="142" r="9" fill="rgba(255,215,0,0.2)" stroke="rgba(255,215,0,0.5)" stroke-width="1.5"/>
-          <rect x="94" y="136" width="36" height="8" rx="3" fill="rgba(255,215,0,0.55)"/>
-          <rect x="94" y="148" width="130" height="6" rx="3" fill="rgba(110,109,138,0.35)"/>
-          <!-- Branch from v1.1 -->
-          <line x1="74" y1="151" x2="120" y2="184" stroke="rgba(0,255,209,0.2)" stroke-width="1.5" stroke-dasharray="3 3"/>
-          <circle cx="128" cy="190" r="8" fill="rgba(0,255,209,0.12)" stroke="rgba(0,255,209,0.4)" stroke-width="1.5"/>
-          <rect x="144" y="185" width="36" height="7" rx="3" fill="rgba(0,255,209,0.4)"/>
-          <rect x="144" y="196" width="90" height="6" rx="3" fill="rgba(110,109,138,0.3)"/>
-          <!-- v2.0 — community pick -->
-          <circle cx="74" cy="218" r="11" fill="rgba(168,85,247,0.4)" stroke="rgba(168,85,247,1)" stroke-width="2"/>
-          <rect x="94" y="212" width="36" height="8" rx="3" fill="rgba(255,255,255,0.7)"/>
-          <rect x="94" y="224" width="130" height="6" rx="3" fill="rgba(110,109,138,0.4)"/>
-          <rect x="254" y="210" width="96" height="20" rx="100" fill="rgba(168,85,247,0.15)" stroke="rgba(168,85,247,0.45)" stroke-width="1"/>
-          <rect x="264" y="216" width="74" height="8" rx="3" fill="rgba(168,85,247,0.65)"/>
-          <!-- Glow -->
-          <ellipse cx="200" cy="160" rx="100" ry="50" fill="rgba(255,215,0,0.04)"/>
-        </svg>
-      </div>
+    <div class="cs-img-tile" style="aspect-ratio:auto;height:auto;">
+      <img src="promptra - 3.png" alt="Promptra Studio" style="width:100%;height:auto;display:block;">
     </div>
-
-    <!-- Tile 3: Creator Studio Editor Panel -->
-    <div class="cs-img-tile">
-      <div style="width:100%;height:100%;background:linear-gradient(135deg,#0e0820,#1a1200);">
-        <svg width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="gp3" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#0e0820"/>
-              <stop offset="100%" stop-color="#1a1200"/>
-            </linearGradient>
-            <linearGradient id="btnGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#a855f7"/>
-              <stop offset="100%" stop-color="#ffd700"/>
-            </linearGradient>
-          </defs>
-          <rect width="400" height="300" fill="url(#gp3)"/>
-          <rect x="20" y="20" width="360" height="260" rx="14" fill="rgba(14,10,28,0.88)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-          <!-- Editor toolbar -->
-          <rect x="20" y="20" width="360" height="36" rx="14" fill="rgba(20,14,40,0.95)"/>
-          <rect x="20" y="40" width="360" height="16" rx="0" fill="rgba(20,14,40,0.95)"/>
-          <rect x="36" y="30" width="80" height="8" rx="3" fill="rgba(168,85,247,0.6)"/>
-          <rect x="256" y="26" width="56" height="20" rx="100" fill="url(#btnGrad)" opacity="0.9"/>
-          <rect x="264" y="32" width="40" height="8" rx="3" fill="rgba(14,10,28,0.9)"/>
-          <!-- Tab bar -->
-          <rect x="20" y="56" width="360" height="28" rx="0" fill="rgba(12,8,24,0.8)"/>
-          <rect x="36" y="64" width="70" height="10" rx="3" fill="rgba(255,255,255,0.35)" />
-          <rect x="116" y="68" width="60" height="6" rx="3" fill="rgba(110,109,138,0.25)"/>
-          <rect x="186" y="68" width="60" height="6" rx="3" fill="rgba(110,109,138,0.25)"/>
-          <!-- Edit area -->
-          <rect x="36" y="98" width="320" height="10" rx="4" fill="rgba(255,255,255,0.22)"/>
-          <rect x="36" y="116" width="280" height="10" rx="4" fill="rgba(255,255,255,0.18)"/>
-          <!-- Highlighted diff line -->
-          <rect x="36" y="134" width="320" height="14" rx="4" fill="rgba(255,215,0,0.1)" stroke="rgba(255,215,0,0.2)" stroke-width="1"/>
-          <rect x="44" y="139" width="260" height="8" rx="3" fill="rgba(255,215,0,0.55)"/>
-          <!-- More lines -->
-          <rect x="36" y="158" width="240" height="10" rx="4" fill="rgba(255,255,255,0.18)"/>
-          <rect x="36" y="176" width="300" height="10" rx="4" fill="rgba(255,255,255,0.14)"/>
-          <!-- Added line -->
-          <rect x="36" y="194" width="320" height="14" rx="4" fill="rgba(168,85,247,0.1)" stroke="rgba(168,85,247,0.22)" stroke-width="1"/>
-          <rect x="44" y="199" width="200" height="8" rx="3" fill="rgba(168,85,247,0.55)"/>
-          <!-- Annotation bubble -->
-          <rect x="180" y="218" width="164" height="44" rx="10" fill="rgba(168,85,247,0.12)" stroke="rgba(168,85,247,0.35)" stroke-width="1"/>
-          <rect x="192" y="228" width="60" height="7" rx="3" fill="rgba(255,255,255,0.5)"/>
-          <rect x="192" y="240" width="140" height="6" rx="3" fill="rgba(110,109,138,0.4)"/>
-          <rect x="192" y="250" width="110" height="6" rx="3" fill="rgba(110,109,138,0.3)"/>
-          <!-- Cursor blink -->
-          <rect x="36" y="212" width="2" height="16" rx="1" fill="rgba(168,85,247,0.9)"/>
-          <!-- Glow -->
-          <ellipse cx="200" cy="160" rx="120" ry="50" fill="rgba(168,85,247,0.05)"/>
-        </svg>
-      </div>
+    <div class="cs-img-tile" style="aspect-ratio:auto;height:auto;">
+      <img src="promptra - 4.png" alt="Promptra Create Prompt" style="width:100%;height:auto;display:block;">
     </div>
-
+    <div class="cs-img-tile" style="aspect-ratio:auto;height:auto;">
+      <img src="promptra - 5.png" alt="Promptra Login" style="width:100%;height:auto;display:block;">
+    </div>
   </div>
 </section>
-
 <!-- ── PROCESS ── -->
 <section class="cs-section">
   <div class="section-label">Design Process</div>
@@ -722,22 +508,22 @@
     <div class="process-item">
       <span class="pi-idx">Pre-Game</span>
       <div class="pi-content">
-        <h3>Alignment & Research</h3>
-        <p>Audited PromptBase, PromptHero, and FlowGPT. All had the same flaw — prompts were static, undiscoverable after publishing, and had no feedback loop. Defined two core user types: creators who build prompts, and consumers who use and remix them.</p>
+        <h3>Identifying the Gap</h3>
+        <p>Observed that the boom in AI tools was creating fragmentation — hundreds of apps, same three models underneath. The real differentiator was prompt quality, yet there was no good place to share, refine, or build on prompts collaboratively. Audited PromptBase and PromptHero — both static libraries with no community loop.</p>
       </div>
     </div>
     <div class="process-item">
       <span class="pi-idx">Game</span>
       <div class="pi-content">
-        <h3>Design & Iteration</h3>
-        <p>The version tree was the most complex UX challenge — making a branching data structure feel intuitive to non-technical users. Solved it with a visual timeline metaphor instead of a tree diagram. Creator Studio went through 5 iterations before the fork/edit/publish flow felt natural.</p>
+        <h3>Designing the Core Flows</h3>
+        <p>The remix flow was the central design challenge — making it feel as easy as sharing a tweet, while keeping version attribution clear. Designed the version history as a simple linear timeline (not a branch tree) so non-technical users could follow how a prompt evolved. The publish flow was kept minimal: title, model tag, prompt body, test output.</p>
       </div>
     </div>
     <div class="process-item">
       <span class="pi-idx">Post Game</span>
       <div class="pi-content">
-        <h3>Handoff & QA</h3>
-        <p>Delivered interaction specs for the version timeline animation, Creator Studio transitions, and the social feed scroll behaviour. QA focus was on the versioning UI — ensuring branch state was always clear and never confusing.</p>
+        <h3>Social Layer & Discovery</h3>
+        <p>Designed the feed to surface remixes alongside originals — so creators get visibility for both their work and what it inspires. Category and model tags make prompts filterable without overwhelming the UI. The platform is built to reward quality over quantity, giving good prompts a longer discovery shelf life.</p>
       </div>
     </div>
   </div>
@@ -749,16 +535,16 @@
   <h2>What it <em>delivered</em></h2>
   <div class="metrics-grid">
     <div class="metric-card">
-      <div class="metric-n">2</div>
-      <div class="metric-l">Net-new product concepts (Creator Studio + Versioning) with no direct market equivalent</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-n">5×</div>
-      <div class="metric-l">Iterations to nail the fork/publish flow until it felt completely natural</div>
+      <div class="metric-n">3</div>
+      <div class="metric-l">Differentiated core mechanics — publish, version history, and in-platform remix — with no direct equivalent in the market</div>
     </div>
     <div class="metric-card">
       <div class="metric-n">0→1</div>
-      <div class="metric-l">Platform designed end-to-end, from blank canvas to full interaction spec</div>
+      <div class="metric-l">Full product concept designed from scratch — from identifying the gap to complete interaction spec</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-n">1 idea</div>
+      <div class="metric-l">Prompts as living, community-owned assets — not static text snippets hoarded in private notes</div>
     </div>
   </div>
 </section>

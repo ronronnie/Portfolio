@@ -43,35 +43,67 @@
     #cur-ring.hov { width:64px; height:64px; border-color:rgba(255,51,112,.5); }
     @media (max-width:768px) { body { cursor:auto; } #cur-dot,#cur-ring { display:none; } }
 
+    /* ── PROGRESS BAR ── */
+    .nav-progress {
+      position: fixed; top: 0; left: 0; right: 0; height: 2px;
+      background: rgba(255,255,255,.06); z-index: 1100;
+    }
+    .nav-progress-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--p), var(--c));
+      transition: width .1s linear;
+    }
+
     /* ── NAV ── */
     nav {
-      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
       display: flex; align-items: center; justify-content: space-between;
-      gap: 32px; z-index: 1000;
-      background: rgba(14,14,28,.72); backdrop-filter: blur(18px);
+      z-index: 1000;
+      background: rgba(10,10,22,.8); backdrop-filter: blur(24px) saturate(1.4);
       border: 1px solid var(--border); border-radius: 100px;
-      padding: 10px 20px 10px 16px;
-      width: min(92vw, 720px);
+      padding: 8px 8px 8px 8px;
+      width: min(94vw, 780px);
+      gap: 0;
     }
-    .nav-back {
-      display: flex; align-items: center; gap: 10px;
-      font-family: var(--mono); font-size: .72rem; color: var(--muted);
-      text-decoration: none; letter-spacing: .06em;
+    .nav-left {
+      display: flex; align-items: center; gap: 0;
+      text-decoration: none; flex-shrink: 0;
+    }
+    .nav-logo-mark {
+      font-family: var(--mono); font-size: .78rem; font-weight: 700;
+      color: var(--bg); letter-spacing: .06em;
+      background: linear-gradient(135deg, var(--p), var(--c));
+      padding: 7px 13px; border-radius: 100px;
+      transition: opacity .3s;
+    }
+    .nav-left:hover .nav-logo-mark { opacity: .85; }
+    .nav-back-label {
+      font-family: var(--mono); font-size: .68rem; color: var(--muted);
+      letter-spacing: .06em; padding: 0 16px;
+      display: flex; align-items: center; gap: 8px;
       transition: color .3s;
     }
-    .nav-back:hover { color: var(--c); }
-    .nav-back .arrow { font-size: 1rem; transition: transform .3s; }
-    .nav-back:hover .arrow { transform: translateX(-4px); }
-    .nav-logo { font-family: var(--mono); font-size: .8rem; color: var(--text); font-weight: 700; letter-spacing: .08em; }
+    .nav-back-arrow { transition: transform .3s; display: inline-block; }
+    .nav-left:hover .nav-back-label { color: var(--c); }
+    .nav-left:hover .nav-back-arrow { transform: translateX(-4px); }
+    .nav-center {
+      flex: 1; text-align: center;
+      font-family: var(--mono); font-size: .72rem; color: var(--text);
+      letter-spacing: .1em; text-transform: uppercase;
+      opacity: 0; transition: opacity .4s ease;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      padding: 0 12px;
+    }
+    .nav-center.visible { opacity: 1; }
     .nav-cta {
       font-family: var(--mono); font-size: .7rem; letter-spacing: .08em;
-      padding: 8px 18px; border-radius: 100px;
-      background: linear-gradient(135deg, var(--p), var(--c));
-      color: var(--bg); font-weight: 700; text-decoration: none;
-      transition: opacity .3s, transform .3s;
-      white-space: nowrap;
+      padding: 8px 20px; border-radius: 100px;
+      border: 1px solid var(--border);
+      color: var(--text); font-weight: 600; text-decoration: none;
+      transition: background .3s, border-color .3s, color .3s, transform .3s;
+      white-space: nowrap; flex-shrink: 0;
     }
-    .nav-cta:hover { opacity: .85; transform: scale(1.04); }
+    .nav-cta:hover { background: var(--p); border-color: var(--p); color: var(--bg); transform: scale(1.04); }
 
     /* ── HERO ── */
     .cs-hero {
@@ -328,7 +360,9 @@
 
     /* ── MOBILE ── */
     @media (max-width: 768px) {
-      nav { left:0; right:0; transform:none; top:0; border-radius:0; border-left:none; border-right:none; border-top:none; width:100%; }
+      nav { left:0; right:0; transform:none; top:0; border-radius:0; border-left:none; border-right:none; border-top:none; width:100%; padding:6px 8px; }
+      .nav-back-label { padding: 0 10px; }
+      .nav-center { display: none; }
       .cs-meta { grid-template-columns: 1fr 1fr; }
       .meta-item:nth-child(2) { border-right: none; }
       .two-col { grid-template-columns: 1fr; }
@@ -351,10 +385,16 @@
 <div id="cur-dot"></div>
 <div id="cur-ring"></div>
 
+<!-- ── PROGRESS BAR ── -->
+<div class="nav-progress"><div class="nav-progress-fill" id="npf"></div></div>
+
 <!-- ── NAV ── -->
 <nav>
-  <a href="index.html" class="nav-back"><span class="arrow">←</span> Back to Portfolio</a>
-  <span class="nav-logo">RA</span>
+  <a href="index.html" class="nav-left">
+    <span class="nav-logo-mark">RA</span>
+    <span class="nav-back-label"><span class="nav-back-arrow">←</span> Portfolio</span>
+  </a>
+  <span class="nav-center" id="nav-title">Case Studies</span>
   <a href="index.html#contact" class="nav-cta">Let's Talk</a>
 </nav>
 
@@ -407,112 +447,20 @@
 
 <!-- ── SWIGGY HERO IMAGE ── -->
 <div class="cs-section" style="padding-top:80px; padding-bottom:0">
-  <div class="cs-img-full">
-    <div class="img-placeholder" style="background: linear-gradient(135deg, #0e0e1c 0%, #1a0f18 40%, #0a1a10 100%);">
-      <svg width="100%" height="100%" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="swiggyCover" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#0e0e1c"/>
-            <stop offset="50%" stop-color="#1a0e1a"/>
-            <stop offset="100%" stop-color="#071a10"/>
-          </linearGradient>
-          <linearGradient id="swiggyPink" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#ff3370"/>
-            <stop offset="100%" stop-color="#00ffd1"/>
-          </linearGradient>
-        </defs>
-        <rect width="1200" height="600" fill="url(#swiggyCover)"/>
-        <!-- Mobile frame left -->
-        <rect x="100" y="60" width="220" height="480" rx="28" fill="rgba(20,20,40,0.95)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
-        <!-- Status bar -->
-        <rect x="120" y="80" width="180" height="8" rx="4" fill="rgba(255,255,255,0.06)"/>
-        <!-- Header -->
-        <rect x="120" y="108" width="180" height="36" rx="8" fill="rgba(255,51,112,0.1)" stroke="rgba(255,51,112,0.2)" stroke-width="1"/>
-        <rect x="132" y="120" width="100" height="12" rx="4" fill="rgba(255,51,112,0.7)"/>
-        <!-- Group session banner -->
-        <rect x="120" y="156" width="180" height="48" rx="10" fill="rgba(255,51,112,0.08)" stroke="rgba(255,51,112,0.15)" stroke-width="1"/>
-        <!-- Avatars row -->
-        <circle cx="138" cy="180" r="14" fill="rgba(255,51,112,0.3)" stroke="rgba(255,51,112,0.5)" stroke-width="1.5"/>
-        <circle cx="158" cy="180" r="14" fill="rgba(0,255,209,0.3)" stroke="rgba(0,255,209,0.5)" stroke-width="1.5"/>
-        <circle cx="178" cy="180" r="14" fill="rgba(139,92,246,0.3)" stroke="rgba(139,92,246,0.5)" stroke-width="1.5"/>
-        <circle cx="198" cy="180" r="14" fill="rgba(255,215,0,0.3)" stroke="rgba(255,215,0,0.5)" stroke-width="1.5"/>
-        <rect x="222" y="173" width="64" height="10" rx="4" fill="rgba(255,255,255,0.35)"/>
-        <!-- Cart items -->
-        <rect x="120" y="216" width="180" height="54" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-        <circle cx="140" cy="243" r="12" fill="rgba(255,51,112,0.15)"/>
-        <rect x="158" y="235" width="80" height="9" rx="4" fill="rgba(255,255,255,0.4)"/>
-        <rect x="158" y="250" width="56" height="7" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <rect x="258" y="237" width="28" height="18" rx="100" fill="rgba(255,51,112,0.2)" stroke="rgba(255,51,112,0.4)" stroke-width="1"/>
-        <rect x="120" y="278" width="180" height="54" rx="8" fill="rgba(0,255,209,0.04)" stroke="rgba(0,255,209,0.08)" stroke-width="1"/>
-        <circle cx="140" cy="305" r="12" fill="rgba(0,255,209,0.15)"/>
-        <rect x="158" y="297" width="70" height="9" rx="4" fill="rgba(255,255,255,0.4)"/>
-        <rect x="158" y="312" width="52" height="7" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <rect x="258" y="299" width="28" height="18" rx="100" fill="rgba(0,255,209,0.2)" stroke="rgba(0,255,209,0.4)" stroke-width="1"/>
-        <rect x="120" y="340" width="180" height="54" rx="8" fill="rgba(139,92,246,0.04)" stroke="rgba(139,92,246,0.08)" stroke-width="1"/>
-        <circle cx="140" cy="367" r="12" fill="rgba(139,92,246,0.15)"/>
-        <rect x="158" y="359" width="76" height="9" rx="4" fill="rgba(255,255,255,0.4)"/>
-        <rect x="158" y="374" width="48" height="7" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <rect x="258" y="361" width="28" height="18" rx="100" fill="rgba(139,92,246,0.2)" stroke="rgba(139,92,246,0.4)" stroke-width="1"/>
-        <!-- CTA Button -->
-        <rect x="120" y="408" width="180" height="44" rx="10" fill="url(#swiggyPink)"/>
-        <rect x="160" y="424" width="100" height="12" rx="4" fill="rgba(0,0,0,0.4)"/>
-        <!-- Bottom nav -->
-        <rect x="120" y="464" width="180" height="56" rx="0" fill="rgba(14,14,28,0.98)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-        <circle cx="150" cy="492" r="10" fill="rgba(255,51,112,0.3)"/>
-        <circle cx="210" cy="492" r="10" fill="rgba(255,255,255,0.06)"/>
-        <circle cx="270" cy="492" r="10" fill="rgba(255,255,255,0.06)"/>
-
-        <!-- Mobile frame right — real-time cart -->
-        <rect x="880" y="60" width="220" height="480" rx="28" fill="rgba(20,20,40,0.95)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
-        <rect x="900" y="80" width="180" height="8" rx="4" fill="rgba(255,255,255,0.06)"/>
-        <rect x="900" y="108" width="180" height="18" rx="5" fill="rgba(255,255,255,0.04)"/>
-        <rect x="900" y="134" width="120" height="14" rx="4" fill="rgba(255,255,255,0.3)"/>
-        <rect x="900" y="154" width="80" height="8" rx="4" fill="rgba(110,109,138,0.35)"/>
-        <!-- Live panel header -->
-        <rect x="900" y="174" width="180" height="28" rx="6" fill="rgba(0,255,209,0.08)" stroke="rgba(0,255,209,0.2)" stroke-width="1"/>
-        <circle cx="914" cy="188" r="5" fill="rgba(0,255,209,0.8)"/>
-        <rect x="924" y="183" width="90" height="9" rx="4" fill="rgba(0,255,209,0.5)"/>
-        <!-- Member items -->
-        <rect x="900" y="212" width="180" height="42" rx="8" fill="rgba(255,255,255,0.03)"/>
-        <circle cx="916" cy="233" r="10" fill="rgba(255,51,112,0.3)"/>
-        <rect x="932" y="226" width="60" height="8" rx="4" fill="rgba(255,255,255,0.5)"/>
-        <rect x="932" y="239" width="80" height="7" rx="4" fill="rgba(110,109,138,0.35)"/>
-        <rect x="900" y="262" width="180" height="42" rx="8" fill="rgba(0,255,209,0.03)"/>
-        <circle cx="916" cy="283" r="10" fill="rgba(0,255,209,0.3)"/>
-        <rect x="932" y="276" width="56" height="8" rx="4" fill="rgba(255,255,255,0.5)"/>
-        <rect x="932" y="289" width="72" height="7" rx="4" fill="rgba(110,109,138,0.35)"/>
-        <rect x="900" y="312" width="180" height="42" rx="8" fill="rgba(139,92,246,0.03)"/>
-        <circle cx="916" cy="333" r="10" fill="rgba(139,92,246,0.3)"/>
-        <rect x="932" y="326" width="64" height="8" rx="4" fill="rgba(255,255,255,0.5)"/>
-        <rect x="932" y="339" width="44" height="7" rx="4" fill="rgba(110,109,138,0.35)"/>
-        <!-- Ready signals -->
-        <rect x="900" y="366" width="180" height="52" rx="10" fill="rgba(0,255,209,0.06)" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
-        <rect x="912" y="378" width="130" height="10" rx="4" fill="rgba(255,255,255,0.4)"/>
-        <rect x="912" y="396" width="80" height="8" rx="4" fill="rgba(0,255,209,0.5)"/>
-        <rect x="900" y="428" width="180" height="44" rx="10" fill="url(#swiggyPink)"/>
-        <rect x="940" y="444" width="100" height="12" rx="4" fill="rgba(0,0,0,0.4)"/>
-
-        <!-- Center label -->
-        <rect x="380" y="240" width="440" height="120" rx="16" fill="rgba(14,14,28,0.0)"/>
-        <rect x="400" y="258" width="200" height="14" rx="4" fill="rgba(255,51,112,0.4)"/>
-        <rect x="400" y="282" width="320" height="30" rx="6" fill="rgba(255,255,255,0.07)"/>
-        <rect x="400" y="322" width="260" height="12" rx="4" fill="rgba(110,109,138,0.3)"/>
-
-        <!-- Glow -->
-        <ellipse cx="210" cy="300" rx="120" ry="200" fill="rgba(255,51,112,0.04)"/>
-        <ellipse cx="990" cy="300" rx="120" ry="200" fill="rgba(0,255,209,0.04)"/>
-        <ellipse cx="600" cy="300" rx="180" ry="100" fill="rgba(139,92,246,0.04)"/>
-      </svg>
-    </div>
+  <div class="cs-img-full" style="aspect-ratio:auto;height:auto;">
+    <img src="swiggy svg final.svg" alt="Swiggy Group Order Case Study" style="width:100%;height:auto;display:block;">
   </div>
 </div>
-
 <!-- ── SWIGGY OVERVIEW ── -->
 <section class="cs-section">
   <div class="two-col">
     <div>
       <div class="section-label">01 / Swiggy</div>
       <h2>Group Ordering — <em>Redesigned</em></h2>
+      <a href="https://www.figma.com/design/6zXHynjvNcvO4Ai95V5Wt0/Swiggy-group-order-case-study?node-id=2-3" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;margin-top:20px;font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;color:var(--c);text-decoration:none;border:1px solid rgba(0,255,209,.25);padding:8px 16px;border-radius:100px;transition:background .3s,border-color .3s;" onmouseenter="this.style.background='rgba(0,255,209,.08)';this.style.borderColor='rgba(0,255,209,.5)'" onmouseleave="this.style.background='';this.style.borderColor='rgba(0,255,209,.25)'">
+        <svg width="14" height="14" viewBox="0 0 38 57" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 0C8.507 0 0 8.507 0 19s8.507 19 19 19 19-8.507 19-19S29.493 0 19 0zm0 29.5c-5.799 0-10.5-4.701-10.5-10.5S13.201 8.5 19 8.5 29.5 13.201 29.5 19 24.799 29.5 19 29.5zM19 38v19" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>
+        View in Figma ↗
+      </a>
     </div>
     <div style="padding-top: 80px;">
       <p class="cs-body">Swiggy's group order feature lets multiple people add to a single cart — but the experience is fragmented, confusing, and prone to mid-flow drop-offs. The challenge: make group food ordering feel as effortless as ordering for one.</p>
@@ -583,100 +531,24 @@
 
 <!-- ── GPAY HERO IMAGE ── -->
 <div class="cs-section" style="padding-top:80px; padding-bottom:0">
-  <div class="cs-img-full">
-    <div class="img-placeholder" style="background: linear-gradient(135deg, #070f14 0%, #0a1220 40%, #071a14 100%);">
-      <svg width="100%" height="100%" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="gpayCover" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#070f14"/>
-            <stop offset="50%" stop-color="#0a1220"/>
-            <stop offset="100%" stop-color="#071a14"/>
-          </linearGradient>
-          <linearGradient id="gpayGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#ff3370"/>
-            <stop offset="100%" stop-color="#00ffd1"/>
-          </linearGradient>
-          <linearGradient id="gpayRing" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="rgba(0,255,209,0.6)"/>
-            <stop offset="100%" stop-color="rgba(255,51,112,0.6)"/>
-          </linearGradient>
-        </defs>
-        <rect width="1200" height="600" fill="url(#gpayCover)"/>
-
-        <!-- Mobile frame — Processing screen -->
-        <rect x="440" y="40" width="320" height="520" rx="36" fill="rgba(10,18,32,0.97)" stroke="rgba(255,255,255,0.1)" stroke-width="1.5"/>
-        <!-- Status bar -->
-        <rect x="460" y="62" width="280" height="8" rx="4" fill="rgba(255,255,255,0.04)"/>
-        <!-- Header text -->
-        <rect x="490" y="96" width="220" height="18" rx="5" fill="rgba(255,255,255,0.1)"/>
-        <rect x="520" y="122" width="160" height="10" rx="4" fill="rgba(110,109,138,0.4)"/>
-
-        <!-- Pulsing ring animation (static representation) -->
-        <circle cx="600" cy="240" r="72" fill="none" stroke="url(#gpayRing)" stroke-width="3" opacity="0.9"/>
-        <circle cx="600" cy="240" r="56" fill="none" stroke="rgba(0,255,209,0.15)" stroke-width="1"/>
-        <circle cx="600" cy="240" r="40" fill="rgba(0,255,209,0.06)" stroke="rgba(0,255,209,0.2)" stroke-width="1"/>
-        <!-- G Pay icon placeholder -->
-        <rect x="576" y="224" width="48" height="32" rx="8" fill="rgba(255,255,255,0.08)"/>
-        <rect x="584" y="232" width="24" height="16" rx="4" fill="rgba(0,255,209,0.3)"/>
-
-        <!-- Step checklist -->
-        <rect x="470" y="332" width="260" height="38" rx="9" fill="rgba(0,255,209,0.08)" stroke="rgba(0,255,209,0.2)" stroke-width="1"/>
-        <circle cx="492" cy="351" r="9" fill="rgba(0,255,209,0.8)"/>
-        <rect x="488" y="347" width="8" height="8" rx="2" fill="rgba(0,0,0,0.6)"/>
-        <rect x="510" y="346" width="120" height="9" rx="4" fill="rgba(255,255,255,0.5)"/>
-        <rect x="510" y="359" width="80" height="7" rx="4" fill="rgba(0,255,209,0.4)"/>
-
-        <rect x="470" y="378" width="260" height="38" rx="9" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-        <circle cx="492" cy="397" r="9" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
-        <rect x="510" y="392" width="100" height="9" rx="4" fill="rgba(255,255,255,0.3)"/>
-        <rect x="510" y="405" width="64" height="7" rx="4" fill="rgba(110,109,138,0.3)"/>
-
-        <rect x="470" y="424" width="260" height="38" rx="9" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-        <circle cx="492" cy="443" r="9" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
-        <rect x="510" y="438" width="80" height="9" rx="4" fill="rgba(255,255,255,0.3)"/>
-        <rect x="510" y="451" width="112" height="7" rx="4" fill="rgba(110,109,138,0.3)"/>
-
-        <!-- Bank trust strip -->
-        <rect x="470" y="480" width="260" height="48" rx="10" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-        <rect x="486" y="494" width="80" height="8" rx="4" fill="rgba(110,109,138,0.35)"/>
-        <rect x="486" y="508" width="120" height="9" rx="4" fill="rgba(255,255,255,0.25)"/>
-        <rect x="686" y="490" width="28" height="28" rx="6" fill="rgba(0,255,209,0.1)" stroke="rgba(0,255,209,0.2)" stroke-width="1"/>
-
-        <!-- Background glow -->
-        <ellipse cx="600" cy="240" rx="160" ry="160" fill="rgba(0,255,209,0.03)"/>
-        <ellipse cx="300" cy="300" rx="200" ry="150" fill="rgba(255,51,112,0.03)"/>
-        <ellipse cx="900" cy="300" rx="200" ry="150" fill="rgba(0,255,209,0.03)"/>
-
-        <!-- Side annotations (left) -->
-        <rect x="100" y="200" width="260" height="80" rx="12" fill="rgba(14,14,28,0.7)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-        <rect x="120" y="218" width="80" height="10" rx="4" fill="rgba(255,51,112,0.5)"/>
-        <rect x="120" y="236" width="210" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <rect x="120" y="252" width="180" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
-        <!-- Connector line -->
-        <line x1="360" y1="240" x2="440" y2="240" stroke="rgba(255,51,112,0.2)" stroke-width="1" stroke-dasharray="4 4"/>
-
-        <!-- Side annotations (right) -->
-        <rect x="840" y="320" width="260" height="80" rx="12" fill="rgba(14,14,28,0.7)" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-        <rect x="860" y="338" width="80" height="10" rx="4" fill="rgba(0,255,209,0.5)"/>
-        <rect x="860" y="356" width="210" height="8" rx="4" fill="rgba(110,109,138,0.4)"/>
-        <rect x="860" y="372" width="150" height="8" rx="4" fill="rgba(110,109,138,0.3)"/>
-        <!-- Connector line -->
-        <line x1="760" y1="360" x2="840" y2="360" stroke="rgba(0,255,209,0.2)" stroke-width="1" stroke-dasharray="4 4"/>
-      </svg>
-    </div>
+  <div class="cs-img-full" style="aspect-ratio:auto;height:auto;">
+    <img src="GPAY.png" alt="Google Pay Payment Processing Case Study" style="width:100%;height:auto;display:block;">
   </div>
 </div>
-
 <!-- ── GPAY OVERVIEW ── -->
 <section class="cs-section">
   <div class="two-col">
     <div>
       <div class="section-label">02 / Google Pay</div>
-      <h2>The 'Processing' state that <em>loses trust</em></h2>
+      <h2>When 'Processing' feels like <em>losing money</em></h2>
+      <a href="https://www.figma.com/design/M39Qc1MacUgg022gZKz3sC/Google-pay-error-processing-payments-flow?node-id=0-1" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;margin-top:20px;font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;color:var(--c);text-decoration:none;border:1px solid rgba(0,255,209,.25);padding:8px 16px;border-radius:100px;transition:background .3s,border-color .3s;" onmouseenter="this.style.background='rgba(0,255,209,.08)';this.style.borderColor='rgba(0,255,209,.5)'" onmouseleave="this.style.background='';this.style.borderColor='rgba(0,255,209,.25)'">
+        <svg width="14" height="14" viewBox="0 0 38 57" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 0C8.507 0 0 8.507 0 19s8.507 19 19 19 19-8.507 19-19S29.493 0 19 0zm0 29.5c-5.799 0-10.5-4.701-10.5-10.5S13.201 8.5 19 8.5 29.5 13.201 29.5 19 24.799 29.5 19 29.5zM19 38v19" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg>
+        View in Figma ↗
+      </a>
     </div>
     <div style="padding-top: 80px;">
-      <p class="cs-body">When a Google Pay transaction is processing, users see a generic spinner with no feedback. For 3–8 seconds, they have no idea if the payment went through, if it's stuck, or if something went wrong. That uncertainty is a UX failure.</p>
-      <p class="cs-body">The redesign focused on making the processing state feel alive — communicating progress, reducing anxiety, and giving users confidence that something real is happening.</p>
+      <p class="cs-body">In India, a significant portion of UPI users are first-generation smartphone users — people who transitioned from cash to digital payments without a strong foundation of digital trust. When a Google Pay transaction gets stuck in "Processing," there's no feedback, no timeline, no explanation. For these users, that silence isn't a minor inconvenience — it's panic.</p>
+      <p class="cs-body">The redesign focused on one psychological insight: if you can show a user exactly where their money is and what's happening step by step, the fear disappears. Transparency is the feature.</p>
     </div>
   </div>
 </section>
@@ -684,23 +556,23 @@
 <!-- ── GPAY PROBLEM AREAS ── -->
 <section class="cs-section" style="padding-top:0">
   <div class="section-label">Problem Areas</div>
-  <h2>3–8 seconds of <em>uncertainty</em></h2>
+  <h2>Silence is the <em>real failure state</em></h2>
 
   <div class="feature-list gpay-features">
     <div class="feature-row">
       <span class="feature-num">[01]</span>
-      <h3 class="feature-title">Zero Progress Feedback</h3>
-      <p class="feature-desc">The existing spinner gives no sense of stages. Is it connecting? Verifying? Waiting for the bank? A redesigned state machine communicates each micro-step with clear, calming language.</p>
+      <h3 class="feature-title">No Visibility Into the Payment Journey</h3>
+      <p class="feature-desc">The existing "Processing" screen shows a static label and nothing else. Users have no way of knowing if the money left their account, if it's with the bank, or if it's reached the recipient. For non-tech-savvy users, this ambiguity feels like loss.</p>
     </div>
     <div class="feature-row">
       <span class="feature-num">[02]</span>
-      <h3 class="feature-title">Ambiguous Failure States</h3>
-      <p class="feature-desc">When a payment fails, the error screen arrives abruptly with no transition. Users aren't sure if they were charged. Redesigned with a graceful failure state that answers the most important question first: "You were not charged."</p>
+      <h3 class="feature-title">No Path to Help During the Wait</h3>
+      <p class="feature-desc">When something feels wrong, users need a clear next step. The current UI offers no in-context way to contact their bank or raise a concern — forcing them to exit the app, call a helpline, or simply wait in anxiety.</p>
     </div>
     <div class="feature-row">
       <span class="feature-num">[03]</span>
-      <h3 class="feature-title">Trust Signals During Wait</h3>
-      <p class="feature-desc">High-value payments create disproportionate anxiety during the wait. Added contextual reassurance — bank name, masked account, and a real-time status indicator — so users feel informed, not abandoned.</p>
+      <h3 class="feature-title">Trust Collapse at the Worst Moment</h3>
+      <p class="feature-desc">The processing state is the highest-stakes moment in the payment flow. A blank screen communicates nothing — and for first-generation digital users, "nothing" reads as "something went wrong." The redesign makes that moment the most reassuring part of the journey.</p>
     </div>
   </div>
 </section>
@@ -708,27 +580,27 @@
 <!-- ── GPAY PROCESS ── -->
 <section class="cs-section" style="padding-top:0">
   <div class="section-label">Design Process</div>
-  <h2>Designing <em>calm under pressure</em></h2>
+  <h2>Designing for <em>psychological safety</em></h2>
   <div class="process-items gpay-process">
     <div class="process-item">
       <span class="pi-idx">Pre-Game</span>
       <div class="pi-content">
-        <h3>Mapping the Anxiety Window</h3>
-        <p>Mapped the full payment journey from tap-to-confirm. Identified that 100% of anxiety occurs in the 3–8 second processing window. Referenced research on perceived wait time and animation's effect on anxiety reduction.</p>
+        <h3>Understanding the Fear, Not the Flow</h3>
+        <p>The research phase focused less on the technical payment flow and more on the emotional state of the user during it. Interviews with low-digital-literacy users in Tier 2 and Tier 3 Indian cities revealed a consistent pattern: prolonged processing = assumed money loss. The fix wasn't speed — it was communication.</p>
       </div>
     </div>
     <div class="process-item">
       <span class="pi-idx">Game</span>
       <div class="pi-content">
-        <h3>Testing 4 Processing Animations</h3>
-        <p>Designed 4 versions of the processing animation — a progress bar, a pulsing ring, a step-by-step checklist, and a morphing icon. User testing showed the step-by-step checklist (even with fabricated steps) reduced anxiety by making the wait feel purposeful.</p>
+        <h3>Step-by-Step Timeline + Bank Agent Access</h3>
+        <p>Designed a live payment timeline that shows each stage as it happens — Transfer Initiated → Bank Processing → Reaching Recipient — with plain-language descriptions at every step. Alongside it, a contextual "Get help from bank agent" shortcut surfaces only when the payment has been processing beyond the expected window, giving users a direct escalation path without leaving the flow.</p>
       </div>
     </div>
     <div class="process-item">
       <span class="pi-idx">Post Game</span>
       <div class="pi-content">
-        <h3>Motion Specs & State Machine</h3>
-        <p>Delivered motion specs for the processing state transitions. Documented the full state machine: pending → processing → success / failure, with timing and easing for each transition.</p>
+        <h3>Validation & Handoff</h3>
+        <p>Tested the redesigned processing screen with the same Tier 2 user cohort. Participants consistently reported feeling "more in control" and "less worried" compared to the current experience. The timeline format — borrowed from familiar experiences like delivery tracking — gave users a mental model they already trusted.</p>
       </div>
     </div>
   </div>
@@ -736,7 +608,7 @@
 
 <!-- ── PULL QUOTE ── -->
 <div class="cs-quote">
-  <blockquote>"The best UX is the kind users <em>never notice</em> — but always trust."</blockquote>
+  <blockquote>"For millions of Indians, digital trust isn't given — <em>it has to be shown.</em>"</blockquote>
 </div>
 
 <!-- ── METRICS ── -->
