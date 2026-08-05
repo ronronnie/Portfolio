@@ -1220,14 +1220,19 @@ a.col-value:hover { border-bottom-color: var(--ink); }
     <h2 class="work-title">Selected Work</h2>
 
     <div class="work-tabs" role="tablist" aria-label="Selected work categories">
-      <button class="tab" role="tab" id="tab-design"     aria-controls="panel-design"     aria-selected="true">Design</button>
+      <button class="tab" role="tab" id="tab-all"        aria-controls="panel-all"        aria-selected="true">All</button>
+      <button class="tab" role="tab" id="tab-design"     aria-controls="panel-design"     aria-selected="false">Design</button>
       <button class="tab" role="tab" id="tab-ai"         aria-controls="panel-ai"         aria-selected="false">AI</button>
       <button class="tab" role="tab" id="tab-casestudy"  aria-controls="panel-casestudy"  aria-selected="false">Case Study</button>
       <button class="tab" role="tab" id="tab-fun"        aria-controls="panel-fun"        aria-selected="false">Fun</button>
     </div>
 
     <!-- panels are populated from the PROJECTS array in the script below -->
-    <div class="work-panel" role="tabpanel" id="panel-design" aria-labelledby="tab-design">
+    <div class="work-panel" role="tabpanel" id="panel-all" aria-labelledby="tab-all">
+      <div class="work-grid" data-tab="all"></div>
+    </div>
+
+    <div class="work-panel" role="tabpanel" id="panel-design" aria-labelledby="tab-design" hidden>
       <div class="work-grid" data-tab="design"></div>
     </div>
 
@@ -1823,7 +1828,8 @@ const PROJECTS = [
 
   document.querySelectorAll('.work-grid').forEach(grid => {
     const tab = grid.dataset.tab;
-    grid.innerHTML = PROJECTS.filter(p => p.tab === tab).map(p => `
+    const list = tab === 'all' ? PROJECTS : PROJECTS.filter(p => p.tab === tab);
+    grid.innerHTML = list.map(p => `
       <article class="work-card">
         <div class="card-thumb">${p.thumb
           ? `<img src="${esc(p.thumb)}" alt="" loading="lazy"${
