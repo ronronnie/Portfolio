@@ -2932,6 +2932,16 @@ body.route-project .pv-p strong {
     height: 14px;
   }
 
+  body.route-project .dock {
+    top: auto;
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    transform: translate(-50%, calc(100% + 1.5rem));
+  }
+
+  body.route-project .dock.is-visible {
+    transform: translate(-50%, 0);
+  }
+
   body.route-project .pv-title,
   body.route-project .pv-h {
     text-shadow: 2px 2px 0 #fff, 4px 4px 0 var(--pop-pink);
