@@ -110,6 +110,12 @@ body {
 
 .site-header > * { pointer-events: auto; }
 
+/* on phones the header isn't pinned — it scrolls away with the page.
+   absolute (not static) keeps it out of flow, so nothing below shifts */
+@media (max-width: 700px) {
+  .site-header { position: absolute; }
+}
+
 .site-name {
   font-family: var(--display);
   font-weight: 400;
