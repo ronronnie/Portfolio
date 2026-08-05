@@ -472,7 +472,8 @@ body.experience-open { overflow: hidden; }
   overflow: hidden;
 }
 
-.card-thumb img {
+.card-thumb img,
+.card-thumb video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -483,7 +484,8 @@ body.experience-open { overflow: hidden; }
   transition: transform 0.5s cubic-bezier(.2,.7,.3,1);
 }
 
-.work-card:hover .card-thumb img {
+.work-card:hover .card-thumb img,
+.work-card:hover .card-thumb video {
   transform: scale(calc(var(--thumb-zoom, 1) * 1.04));
 }
 
@@ -1229,7 +1231,7 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 0;
   pointer-events: none;
   opacity: 0.08;
   mix-blend-mode: multiply;
@@ -1244,13 +1246,18 @@ body::after {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: 9998;
+  z-index: 0;
   pointer-events: none;
   opacity: 0.06;
   background:
     linear-gradient(90deg, transparent 0 49%, var(--pop-red) 49% 51%, transparent 51%),
     linear-gradient(0deg, transparent 0 49%, var(--pop-cyan) 49% 51%, transparent 51%);
   background-size: 44px 44px;
+}
+
+main {
+  position: relative;
+  z-index: 1;
 }
 
 .site-header {
@@ -2204,10 +2211,7 @@ body::after {
 }
 
 #contact {
-  background:
-    radial-gradient(circle at 12% 18%, var(--pop-blue) 0 18%, transparent 18.4%),
-    radial-gradient(circle at 88% 16%, var(--pop-pink) 0 16%, transparent 16.4%),
-    var(--pop-ink);
+  background: var(--pop-ink);
   color: var(--pop-paper);
 }
 
@@ -2517,8 +2521,8 @@ body.route-project .pv-media {
 }
 
 body.route-project .pv-hero-media {
-  aspect-ratio: 4 / 3;
-  max-width: 980px;
+  aspect-ratio: 16 / 9;
+  max-width: 1180px;
   margin: 0 auto 6rem;
   overflow: hidden;
   border-radius: 44px;
@@ -2527,11 +2531,17 @@ body.route-project .pv-hero-media {
   box-shadow: 0 32px 90px rgba(0, 0, 0, 0.12);
 }
 
-body.route-project .pv-hero-media img {
+body.route-project .pv-hero-media img,
+body.route-project .pv-hero-media video {
   width: 100%;
   height: 100%;
   display: block;
   object-fit: cover;
+}
+
+body.route-project .pv-hero-media video {
+  object-fit: contain;
+  background: var(--pop-paper);
 }
 
 body.route-project .pv-section {
@@ -2616,6 +2626,7 @@ body.route-project .pv-figure {
 }
 
 body.route-project .pv-shot {
+  aspect-ratio: 16 / 9;
   border: 0;
   border-radius: 36px;
   background: #fff;
@@ -2623,7 +2634,18 @@ body.route-project .pv-shot {
 }
 
 body.route-project .pv-shot img {
-  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: var(--pop-paper);
+}
+
+body.route-project .pv-shot video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: var(--pop-paper);
 }
 
 body.route-project .pv-caption {
@@ -3564,6 +3586,8 @@ const PROJECTS = [
     timeline: 'Self-initiated',
     live: 'https://subscription-tracker-sigma-ruddy.vercel.app/',
     thumb: 'Subnest/subnest-preview.webp',
+    thumbVideo: 'Subnest/subnest-thumbnail.mp4',
+    heroVideo: 'Subnest/subnest-project-hero.mov',
     shots: [],
     sections: [
       { h: 'The problem' },
@@ -3610,6 +3634,8 @@ const PROJECTS = [
     timeline: 'Self-initiated',
     live: 'https://www.useouts.com/',
     thumb: 'poker%20tracker/poker-preview.webp',
+    thumbVideo: 'poker%20tracker/poker-thumbnail.mp4',
+    heroVideo: 'poker%20tracker/poker-project-hero.mov',
     shots: [],
     sections: [
       { h: 'The problem' },
@@ -3652,6 +3678,7 @@ const PROJECTS = [
     timeline: 'MVP',
     live: 'https://mood-verse-nu.vercel.app/',
     thumb: 'MOOD%20VERSE/moodverse-preview.webp',
+    thumbVideo: 'MOOD%20VERSE/moodverse-thumbnail.mov',
     shots: [],
     sections: [
       { h: 'What it is' },
@@ -3698,6 +3725,7 @@ const PROJECTS = [
     timeline: '13 days, solo',
     live: 'https://medium.com/@ronoldanthony/i-was-using-whisper-flow-but-then-decided-to-build-something-better-transcript-studio-3f581df05ed6',
     thumb: 'case%20study%201/transcript-preview.webp',
+    hideHeroMedia: true,
     shots: [],
     sections: [
       { h: 'The problem' },
@@ -3737,6 +3765,8 @@ const PROJECTS = [
     timeline: 'Self-initiated',
     live: 'https://ai-health-tracking-for-the-elderly.vercel.app/',
     thumb: 'case%20study%202/parentcare-preview.webp',
+    thumbVideo: 'case%20study%202/parentcare-thumbnail.mp4',
+    hideHeroMedia: true,
     shots: ['case%20study%202/Final%20Screens%20-%20End%20to%20End-selection.png'],
     sections: [
       { h: 'The problem' },
@@ -3776,11 +3806,13 @@ const PROJECTS = [
     timeline: 'Side project',
     live: 'https://galaxia-chi.vercel.app/',
     thumb: 'Fun/galaxia-preview.webp',
+    thumbVideo: 'Fun/galaxia-thumbnail.mov',
+    heroVideo: 'Fun/galaxia-project-first.mov',
     shots: [],
     sections: [
       { h: 'The galaxy' },
       { p: '159,000 procedurally generated stars across five spiral arms, with differential orbital speeds — inner stars orbit faster than the outer ones, the way a real galaxy does. It opens on a cinematic formation reveal and holds 60fps in WebGL through Three.js and custom GLSL shaders.' },
-      { img: 'Fun/galaxia-2026-08-04-21-35-16.png',
+      { img: 'Fun/galaxia-section-main.png',
         caption: 'The galaxy at rest — five arms, with the core burning out to white' },
 
       { h: 'Getting around' },
@@ -3790,7 +3822,8 @@ const PROJECTS = [
         '<strong>Hold W for warp.</strong> Lightspeed streaks while the key is down.',
         '<strong>Auto-rotate with idle resume,</strong> so it goes back to being ambient when you stop touching it.'
       ]},
-      { img: 'Fun/galaxia-2026-08-04-21-34-26.png',
+      { video: 'Fun/galaxia-warp.mov',
+        poster: 'Fun/galaxia-2026-08-04-21-34-26.png',
         caption: 'Warp — holding W stretches every star into a streak and blows the core out to white' },
 
       { h: 'Music sync' },
@@ -3829,7 +3862,11 @@ const PROJECTS = [
     const list = tab === 'all' ? PROJECTS : PROJECTS.filter(p => p.tab === tab);
     grid.innerHTML = list.map(p => `
       <article class="work-card">
-        <div class="card-thumb">${p.thumb
+        <div class="card-thumb">${p.thumbVideo
+          ? `<video src="${esc(p.thumbVideo)}" autoplay muted loop playsinline preload="metadata"${
+              p.thumb ? ` poster="${esc(p.thumb)}"` : ''}${
+              p.thumbZoom ? ` style="--thumb-zoom:${Number(p.thumbZoom)}"` : ''}></video>`
+          : p.thumb
           ? `<img src="${esc(p.thumb)}" alt="" loading="lazy"${
               p.thumbZoom ? ` style="--thumb-zoom:${Number(p.thumbZoom)}"` : ''} />`
           : ''}</div>
@@ -3892,7 +3929,11 @@ const PROJECTS = [
     // an empty shots array renders no hero frame at all; a [''] entry
     // renders one empty placeholder on purpose
     const shots = p.shots || [];
-    let html = p.thumb
+    let html = !p.hideHeroMedia && p.heroVideo
+      ? `<figure class="pv-hero-media">
+          <video src="${esc(p.heroVideo)}" autoplay muted loop playsinline preload="metadata"${p.thumb ? ` poster="${esc(p.thumb)}"` : ''}></video>
+        </figure>`
+      : !p.hideHeroMedia && p.thumb
       ? `<figure class="pv-hero-media">
           <img src="${esc(p.thumb)}" alt="" loading="eager" />
         </figure>`
@@ -3912,6 +3953,14 @@ const PROJECTS = [
           return `<figure class="pv-figure">
               <div class="pv-shot">${block.img
                 ? `<img src="${esc(block.img)}" alt="" loading="lazy" onerror="this.remove()" />`
+                : ''}</div>
+              ${block.caption ? `<figcaption class="pv-caption">${esc(block.caption)}</figcaption>` : ''}
+            </figure>`;
+        }
+        if (block.video !== undefined) {
+          return `<figure class="pv-figure">
+              <div class="pv-shot">${block.video
+                ? `<video src="${esc(block.video)}" autoplay muted loop playsinline preload="metadata"${block.poster ? ` poster="${esc(block.poster)}"` : ''}></video>`
                 : ''}</div>
               ${block.caption ? `<figcaption class="pv-caption">${esc(block.caption)}</figcaption>` : ''}
             </figure>`;
