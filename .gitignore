@@ -1,0 +1,5 @@
+# macOS
+.DS_Store
+
+# Claude Code internal state (a full working copy of the repo)
+.claude/worktrees/
