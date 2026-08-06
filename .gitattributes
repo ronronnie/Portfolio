@@ -1,9 +1,0 @@
-Fun/galaxia-project-first.mov filter=lfs diff=lfs merge=lfs -text
-Fun/galaxia-thumbnail.mov filter=lfs diff=lfs merge=lfs -text
-Fun/galaxia-warp.mov filter=lfs diff=lfs merge=lfs -text
-"MOOD VERSE/moodverse-thumbnail.mov" filter=lfs diff=lfs merge=lfs -text
-Subnest/subnest-project-hero.mov filter=lfs diff=lfs merge=lfs -text
-Subnest/subnest-thumbnail.mp4 filter=lfs diff=lfs merge=lfs -text
-"case study 2/parentcare-thumbnail.mp4" filter=lfs diff=lfs merge=lfs -text
-"poker tracker/poker-project-hero.mov" filter=lfs diff=lfs merge=lfs -text
-"poker tracker/poker-thumbnail.mp4" filter=lfs diff=lfs merge=lfs -text

@@ -3587,7 +3587,7 @@ const PROJECTS = [
     live: 'https://subscription-tracker-sigma-ruddy.vercel.app/',
     thumb: 'Subnest/subnest-preview.webp',
     thumbVideo: 'Subnest/subnest-thumbnail.mp4',
-    heroVideo: 'Subnest/subnest-project-hero.mov',
+    heroVideo: 'Subnest/subnest-project-hero.mp4',
     shots: [],
     sections: [
       { h: 'The problem' },
@@ -3635,7 +3635,7 @@ const PROJECTS = [
     live: 'https://www.useouts.com/',
     thumb: 'poker%20tracker/poker-preview.webp',
     thumbVideo: 'poker%20tracker/poker-thumbnail.mp4',
-    heroVideo: 'poker%20tracker/poker-project-hero.mov',
+    heroVideo: 'poker%20tracker/poker-project-hero.mp4',
     shots: [],
     sections: [
       { h: 'The problem' },
@@ -3678,7 +3678,7 @@ const PROJECTS = [
     timeline: 'MVP',
     live: 'https://mood-verse-nu.vercel.app/',
     thumb: 'MOOD%20VERSE/moodverse-preview.webp',
-    thumbVideo: 'MOOD%20VERSE/moodverse-thumbnail.mov',
+    thumbVideo: 'MOOD%20VERSE/moodverse-thumbnail.mp4',
     shots: [],
     sections: [
       { h: 'What it is' },
@@ -3806,13 +3806,13 @@ const PROJECTS = [
     timeline: 'Side project',
     live: 'https://galaxia-chi.vercel.app/',
     thumb: 'Fun/galaxia-preview.webp',
-    thumbVideo: 'Fun/galaxia-thumbnail.mov',
-    heroVideo: 'Fun/galaxia-project-first.mov',
+    thumbVideo: 'Fun/galaxia-thumbnail.mp4',
+    heroVideo: 'Fun/galaxia-project-first.mp4',
     shots: [],
     sections: [
       { h: 'The galaxy' },
       { p: '159,000 procedurally generated stars across five spiral arms, with differential orbital speeds — inner stars orbit faster than the outer ones, the way a real galaxy does. It opens on a cinematic formation reveal and holds 60fps in WebGL through Three.js and custom GLSL shaders.' },
-      { img: 'Fun/galaxia-section-main.png',
+      { img: 'Fun/galaxia-section-main.jpg',
         caption: 'The galaxy at rest — five arms, with the core burning out to white' },
 
       { h: 'Getting around' },
@@ -3822,7 +3822,7 @@ const PROJECTS = [
         '<strong>Hold W for warp.</strong> Lightspeed streaks while the key is down.',
         '<strong>Auto-rotate with idle resume,</strong> so it goes back to being ambient when you stop touching it.'
       ]},
-      { video: 'Fun/galaxia-warp.mov',
+      { video: 'Fun/galaxia-warp.mp4',
         poster: 'Fun/galaxia-2026-08-04-21-34-26.png',
         caption: 'Warp — holding W stretches every star into a streak and blows the core out to white' },
 
@@ -3863,7 +3863,7 @@ const PROJECTS = [
     grid.innerHTML = list.map(p => `
       <article class="work-card">
         <div class="card-thumb">${p.thumbVideo
-          ? `<video src="${esc(p.thumbVideo)}" autoplay muted loop playsinline preload="metadata"${
+          ? `<video data-src="${esc(p.thumbVideo)}" muted loop playsinline preload="none"${
               p.thumb ? ` poster="${esc(p.thumb)}"` : ''}${
               p.thumbZoom ? ` style="--thumb-zoom:${Number(p.thumbZoom)}"` : ''}></video>`
           : p.thumb
@@ -3888,6 +3888,28 @@ const PROJECTS = [
         </a>` : ''}
       </article>`).join('');
   });
+
+  const loadVideo = video => {
+    if (video.dataset.loaded || !video.dataset.src) return;
+    video.src = video.dataset.src;
+    video.dataset.loaded = 'true';
+    video.load();
+    video.play().catch(() => {});
+  };
+
+  const lazyVideos = document.querySelectorAll('.work-grid video[data-src]');
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        loadVideo(entry.target);
+        observer.unobserve(entry.target);
+      });
+    }, { rootMargin: '500px 0px' });
+    lazyVideos.forEach(video => observer.observe(video));
+  } else {
+    lazyVideos.forEach(loadVideo);
+  }
 })();
 
 /* ============================================================
