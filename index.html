@@ -3078,7 +3078,7 @@ body.route-project .pv-p strong {
     <!-- left: sticky portrait + logo marquee -->
     <div class="about-visual">
       <figure class="about-photo">
-        <img src="profile.jpg" alt="Ronold Anthony" />
+        <img src="profile.jpg" alt="Ronold Anthony" loading="lazy" decoding="async" />
       </figure>
 
       <div class="marquee">
@@ -3867,7 +3867,7 @@ const PROJECTS = [
               p.thumb ? ` poster="${esc(p.thumb)}"` : ''}${
               p.thumbZoom ? ` style="--thumb-zoom:${Number(p.thumbZoom)}"` : ''}></video>`
           : p.thumb
-          ? `<img src="${esc(p.thumb)}" alt="" loading="lazy"${
+          ? `<img src="${esc(p.thumb)}" alt="" loading="lazy" decoding="async"${
               p.thumbZoom ? ` style="--thumb-zoom:${Number(p.thumbZoom)}"` : ''} />`
           : ''}</div>
         <div class="card-body">
@@ -3931,6 +3931,33 @@ const PROJECTS = [
   const elMeta = view.querySelector('.pv-meta');
   const elMedia = view.querySelector('.pv-media');
 
+  function loadProjectVideo(video) {
+    if (video.dataset.loaded || !video.dataset.src) return;
+    video.src = video.dataset.src;
+    video.dataset.loaded = 'true';
+    video.load();
+    video.play().catch(() => {});
+  }
+
+  function hydrateProjectVideos() {
+    const videos = elMedia.querySelectorAll('video[data-src]');
+    if (!videos.length) return;
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          loadProjectVideo(entry.target);
+          observer.unobserve(entry.target);
+        });
+      }, { rootMargin: '600px 0px' });
+
+      videos.forEach(video => observer.observe(video));
+    } else {
+      videos.forEach(loadProjectVideo);
+    }
+  }
+
   function renderProject(p) {
     document.title = `${p.title} — Ronold Anthony`;
     elTitle.textContent = p.title;
@@ -3957,12 +3984,12 @@ const PROJECTS = [
         </figure>`
       : !p.hideHeroMedia && p.thumb
       ? `<figure class="pv-hero-media">
-          <img src="${esc(p.thumb)}" alt="" loading="eager" />
+          <img src="${esc(p.thumb)}" alt="" loading="eager" decoding="async" />
         </figure>`
       : '';
 
     html += shots
-      .map(src => `<div class="pv-shot">${src ? `<img src="${esc(src)}" alt="" loading="lazy" />` : ''}</div>`)
+      .map(src => `<div class="pv-shot">${src ? `<img src="${esc(src)}" alt="" loading="lazy" decoding="async" />` : ''}</div>`)
       .join('');
 
     // optional long-form body: headings, paragraphs, lists, figures
@@ -3974,7 +4001,7 @@ const PROJECTS = [
         if (block.img !== undefined) {
           return `<figure class="pv-figure">
               <div class="pv-shot">${block.img
-                ? `<img src="${esc(block.img)}" alt="" loading="lazy" onerror="this.remove()" />`
+                ? `<img src="${esc(block.img)}" alt="" loading="lazy" decoding="async" onerror="this.remove()" />`
                 : ''}</div>
               ${block.caption ? `<figcaption class="pv-caption">${esc(block.caption)}</figcaption>` : ''}
             </figure>`;
@@ -3982,7 +4009,7 @@ const PROJECTS = [
         if (block.video !== undefined) {
           return `<figure class="pv-figure">
               <div class="pv-shot">${block.video
-                ? `<video src="${esc(block.video)}" autoplay muted loop playsinline preload="metadata"${block.poster ? ` poster="${esc(block.poster)}"` : ''}></video>`
+                ? `<video data-src="${esc(block.video)}" muted loop playsinline preload="none"${block.poster ? ` poster="${esc(block.poster)}"` : ''}></video>`
                 : ''}</div>
               ${block.caption ? `<figcaption class="pv-caption">${esc(block.caption)}</figcaption>` : ''}
             </figure>`;
@@ -3992,6 +4019,7 @@ const PROJECTS = [
     }
 
     elMedia.innerHTML = html;
+    hydrateProjectVideos();
   }
 
   let wasProject = false;
